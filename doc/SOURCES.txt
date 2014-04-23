@@ -1,0 +1,35 @@
+http://simap.europa.eu/buyer/forms-standard/index_fi.htm
+
+
+
+
+http://www.hankintailmoitukset.fi/fi/docs/ilmoitusmenettely
+
+EU-kynnysarvot ylittävien hankintojen ilmoittaminen
+Hankinnasta ilmoitetaan EU:n laajuisesti kun tavarahankinta, hankintalain liitteen A mukainen palveluhankinta, rakennusurakka, käyttöoikeusurakka tai suunnittelukilpailu ylittää EU-kynnysarvon. Kun hankinnasta on tehty sopimus tai hankinta on keskeytetty, on siitä vielä tehtävä jälki-ilmoitus. Jälki-ilmoitusvelvollisuus koskee myös hankintalain liitteen B mukaisia palvelu-hankintoja. Kun hankintailmoitus on tehty EU-laajuisena, jälki-ilmoitusvelvollisuudesta muistutetaan TED(Tenders Electronic Daily) -tietokannasta automaattisesti lähetettävällä sähköpostiviestillä.
+
+EU-ilmoituksissa käytetään Euroopan komission asetuksilla 1564/2005/EY ja  1150/2009/EY vahvistamia vakiolomakkeita. Näistä vakiolomakkeista HILMAssa täytetään
+
+ennakkoilmoitus
+EU- hankintailmoitus
+EU-hankintailmoitus, erityisalat
+jälki-ilmoitus
+jälki-ilmoitus, erityisalat
+suorahankintaa koskeva ilmoitus
+dynaamista hankintajärjestelmää koskeva lyhennetty ilmoitus
+HILMAsta ilmoitukset toimitetaan edelleen julkaistavaksi Euroopan unionin virallisen lehden täydennysosassa (S-sarja) sekä TED-tietokannassa. Ilmoitukset tulee tehdä HILMAssa ennen klo 11.30, jotta ne ehtivät EUVL:n julkaisutoimistoon saman päivän aikana. Ilmoitukset julkaistaan HILMAssa vasta sen jälkeen kun ne on toimitettu julkaistavaksi EU-laajuisesti.
+
+Seuraavat vakiolomakeasetuksen mukaiset ilmoitukset voi täyttää suoraan Euroopan yhteisöjen virallisten julkaisujen toimiston ylläpitämässä eNotices-palvelussa (http://simap.europa.eu/enotices/ ):
+
+ohjeellinen kausi-ilmoitus (erityisalat)
+kelpuuttamisjärjestelmä eli toimittajarekisteriä koskeva ilmoitus (erityisalat)
+hankkijaprofiilia koskeva ilmoitus (yhteinen)
+dynaamista hankintajärjestelmää koskeva lyhennetty hankintailmoitus (yhteinen - ei vielä käytössä)
+julkista käyttöoikeusurakkaa koskeva ilmoitus (viranomaissektori)
+hankintailmoitus (käyttöoikeusurakan saajan, joka ei ole hankintaviranomainen, tekemät hankintasopimukset)
+suunnittelukilpailua koskeva ilmoitus (yhteinen)
+suunnittelukilpailun tuloksia koskeva ilmoitus (yhteinen)
+Verkkosivuilta löytyvät ohjeet rekisteröitymiseen. E-Notice palvelussa täytetystä lomakkeesta tulee lisäksi toimittaa tiedot Edita Publishing Oy:öön joko sähköpostin liitteenä osoitteeseen julkiset.hankinnat@edita.fi tai faksina numeroon 020 450 2377.
+
+Simapin (www.simap.europa.eu:) sivuilta löytyvät vakiolomakkeet pdf-muodossa Euroopan unionin virallisen lehden täydennysosassa julkaistavia ilmoituksia varten.
+
