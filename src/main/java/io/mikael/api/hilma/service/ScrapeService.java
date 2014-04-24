@@ -92,14 +92,8 @@ public class ScrapeService {
 
 //    @Scheduled()
     public void scrapeNewList() throws IOException {
-        final Document doc = Jsoup.connect(newListUrl).get();
-        final Elements rows = doc.select("tr");
-        final String start = rows.select("td[0]").text();
-        final String finish = rows.select("td[1]").text();
-        final Element d3 = rows.select("td[2]/a").first();
-        final String link = d3.attr("href");
-        final String text = d3.text();
-
     }
+
+
 
 }

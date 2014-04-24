@@ -38,10 +38,10 @@ public class ScrapeTest {
 
     private static final Pattern TITLE_PATTERN = Pattern.compile("([IVXLCDM]*\\.[0-9]*(?:\\.[0-9]*)) (.*)");
 
-    @Value("classpath:all.html")
+    @Value("classpath:www/all.html")
     private Resource allHtml;
 
-    @Value("classpath:2014-011132.html")
+    @Value("classpath:www/posts/2014-011132.html")
     private Resource detailHtml;
 
     @Test
