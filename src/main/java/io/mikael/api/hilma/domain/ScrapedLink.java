@@ -10,7 +10,8 @@ import java.time.LocalDateTime;
 /**
  * A "new item" link from the "new items" page.
  */
-@Data @Builder @NoArgsConstructor @AllArgsConstructor
+@Data @NoArgsConstructor @AllArgsConstructor
+@Builder(builderClassName = "Builder")
 public class ScrapedLink {
 
     /** FI: Julkaistu. */

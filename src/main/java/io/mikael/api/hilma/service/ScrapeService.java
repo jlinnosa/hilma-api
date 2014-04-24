@@ -67,7 +67,7 @@ public class ScrapeService {
             final Elements data = e.select("td");
             if (data.size() == 4) {
                 final Element linkElement = data.get(3).children().first();
-                final ScrapedLink.ScrapedLinkBuilder bld = ScrapedLink.builder()
+                final ScrapedLink.Builder bld = ScrapedLink.builder()
                         .link(linkElement.attr("href"))
                         .name(linkElement.text())
                         .type(data.get(3).select("span.meta").first().text());
