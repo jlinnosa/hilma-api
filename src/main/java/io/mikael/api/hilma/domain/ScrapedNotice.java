@@ -44,4 +44,6 @@ public class ScrapedNotice {
     /** FI: Virallinen nimi */
     public String organizationName;
 
+    public String note;
+
 }
