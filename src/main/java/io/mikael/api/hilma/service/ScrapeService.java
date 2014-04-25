@@ -1,9 +1,12 @@
 package io.mikael.api.hilma.service;
 
 import io.mikael.api.hilma.domain.ScrapedLink;
+import io.mikael.api.hilma.domain.ScrapedNotice;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Entities;
+import org.jsoup.nodes.Node;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -15,9 +18,12 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 public class ScrapeService {
@@ -26,11 +32,9 @@ public class ScrapeService {
 
     private static final Pattern TITLE_PATTERN = Pattern.compile("([IVXLCDM]*\\.[0-9]*(?:\\.[0-9]*)) (.*)");
 
-    private static final DateTimeFormatter DTFM_PUBLISHED = DateTimeFormatter.ofPattern("d.M.y H.m");
-
-    private static final DateTimeFormatter DTFM_CLOSES = DateTimeFormatter.ofPattern("d.M.y H:m");
-
-    private static final DateTimeFormatter DTFM_DATE_ONLY = DateTimeFormatter.ofPattern("d.M.y");
+    private static final List<DateTimeFormatter> FORMATTERS = Arrays.asList(
+            "d.M.y H.m", "d.M.y H:m", "d.M.y", "d.M.y 'klo' H.m"
+    ).stream().map(DateTimeFormatter::ofPattern).collect(Collectors.toList());
 
     /**
      * HILMA has several suprising alternative date formats.
@@ -39,22 +43,20 @@ public class ScrapeService {
         if (input == null || input.length() == 0) {
             return Optional.empty();
         }
-        try {
-            return Optional.of(LocalDateTime.parse(input, DTFM_PUBLISHED));
-        } catch (final DateTimeParseException e) {
-            // ignore
-        }
-        try {
-            return Optional.of(LocalDateTime.parse(input, DTFM_CLOSES));
-        } catch (final DateTimeParseException e) {
-            // ignore
-        }
-        try {
-            return Optional.of(LocalDateTime.parse(input, DTFM_DATE_ONLY));
-        } catch (final DateTimeParseException e) {
-            // ignore
+        for (final DateTimeFormatter f : FORMATTERS) {
+            try {
+                return Optional.of(LocalDateTime.parse(input, f));
+            } catch (final DateTimeParseException e) {
+                // ignore
+            }
         }
         return Optional.empty();
+    }
+
+    private static String findCode(final String text) {
+        final Matcher m = CPV_PATTERN.matcher(text);
+        m.find();
+        return m.group(1);
     }
 
     /**
@@ -84,6 +86,110 @@ public class ScrapeService {
             }
         }
         return ret;
+    }
+
+    public static Optional<ScrapedNotice> parseNotice(final InputStream is, final String link) throws IOException {
+        final Document doc = Jsoup.parse(is, "UTF-8", link);
+        doc.outputSettings().escapeMode(Entities.EscapeMode.xhtml);
+
+        // link, html
+        final ScrapedNotice.Builder builder = ScrapedNotice.builder()/*.html(doc.outerHtml())*/.link(link);
+
+        final Element content = doc.select("div#mainContent").first();
+
+        // id
+
+        // published
+        content.select("div#datePublished").stream()
+                .map(Element::text)
+                .map(ScrapeService::parseLocalDateTime)
+                .findFirst()
+                .ifPresent(o -> o.ifPresent(builder::published));
+
+        // closes
+        content.select("dt:contains(Tarjoukset tai osallistumishakemukset on toimitettava hankintayksikölle viimeistään) ~ dd").stream()
+                .map(Element::text)
+                .map(ScrapeService::parseLocalDateTime)
+                .findFirst()
+                .ifPresent(o -> o.ifPresent(builder::closes));
+
+        content.select("dt:contains(IV.3.4 Tarjousten vastaanottamisen määräaika) ~ dd").stream()
+                .map(Element::text)
+                .map(ScrapeService::parseLocalDateTime)
+                .findFirst()
+                .ifPresent(o -> o.ifPresent(builder::closes));
+
+        content.select("dt:contains(IV.3.4 Osallistumishakemusten vastaanottamisen määräaika) ~ dd").stream()
+                .map(Element::text)
+                .map(ScrapeService::parseLocalDateTime)
+                .findFirst()
+                .ifPresent(o -> o.ifPresent(builder::closes));
+
+        // note
+        content.select("div.note").stream()
+                .map(Element::text).findFirst().ifPresent(builder::note);
+
+        // mainCpvCode
+        final Elements es = content.select("table.CPV:has(tr > td > strong)");
+        es.select("tr + tr > td").stream()
+                .map(Element::text)
+                .map(ScrapeService::findCode)
+                .findFirst()
+                .ifPresent(builder::mainCpvCode);
+
+        content.select("dt:contains(Yhteinen hankintanimikkeistö \\(CPV\\): Pääkohde) ~ dd").stream()
+                .map(Element::text)
+                .map(ScrapeService::findCode)
+                .findFirst()
+                .ifPresent(builder::mainCpvCode);
+
+        // type, noticeName
+        final List<String> s = content.select("h2").stream()
+                .map(e -> e.childNodes())
+                .flatMap(l -> l.stream())
+                .map(Node::toString)
+                .map(String::trim)
+                .collect(Collectors.toList());
+
+        builder.type(s.get(0).substring(0, s.get(0).length() - 1));
+        builder.noticeName(s.get(2));
+
+        // noticeDescription
+        content.select("dt:contains(II.1.4 Lyhyt kuvaus) ~ dd").stream()
+                .map(Element::text)
+                .findFirst()
+                .ifPresent(builder::noticeDescription);
+
+        // type = Kansallinen hankintailmoitus
+        content.select("dt:contains(Hankinnan kuvaus) ~ dd").stream()
+                .map(Element::text)
+                .findFirst()
+                .ifPresent(builder::noticeDescription);
+
+        content.select("dt:contains(II.1.5 Sopimuksen tai hankinnan \\(hankintojen\\) lyhyt kuvaus) ~ dd").stream()
+                .map(Element::text)
+                .findFirst()
+                .ifPresent(builder::noticeDescription);
+
+        content.select("dt:contains(II.4 Lyhyt kuvaus tavarahankintojen tai palvelujen luonteesta ja määrästä) ~ dd").stream()
+                .map(Element::text)
+                .findFirst()
+                .ifPresent(builder::noticeDescription);
+
+        content.select("dt:contains(II.1.5 Lyhyt kuvaus) ~ dd").stream()
+                .map(Element::text)
+                .findFirst()
+                .ifPresent(builder::noticeDescription);
+
+        content.select("dt:contains(II.1.4 Sopimuksen tai hankinnan \\(hankintojen\\) lyhyt kuvaus) ~ dd").stream()
+                .map(Element::text)
+                .findFirst()
+                .ifPresent(builder::noticeDescription);
+
+
+        // organizationName
+
+        return Optional.of(builder.build());
     }
 
 
