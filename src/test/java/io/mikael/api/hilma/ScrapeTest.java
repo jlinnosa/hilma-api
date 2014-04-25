@@ -6,6 +6,7 @@ import io.mikael.api.hilma.service.ScrapeService;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Entities;
 import org.jsoup.nodes.Node;
 import org.jsoup.select.Elements;
 import org.junit.Test;
@@ -19,8 +20,10 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -49,6 +52,9 @@ public class ScrapeTest {
 
     @Value("classpath:www/posts/2014-011132.html")
     private Resource detailHtml;
+
+    @Value("classpath:www/posts")
+    private Resource postsDirectory;
 
     @Test
     public void testListScrape() throws IOException {
@@ -108,6 +114,7 @@ public class ScrapeTest {
 
     public static Optional<ScrapedNotice> parseNotice(final InputStream is, final String link) throws IOException {
         final Document doc = Jsoup.parse(is, "UTF-8", link);
+        doc.outputSettings().escapeMode(Entities.EscapeMode.xhtml);
 
         // link, html
         final ScrapedNotice.Builder builder = ScrapedNotice.builder()/*.html(doc.outerHtml())*/.link(link);
@@ -132,6 +139,12 @@ public class ScrapeTest {
                 .findFirst()
                 .ifPresent(builder::mainCpvCode);
 
+        content.select("dt:contains(Yhteinen hankintanimikkeistö \\(CPV\\): Pääkohde) ~ dd").stream()
+                .map(Element::text)
+                .map(ScrapeTest::findCode)
+                .findFirst()
+                .ifPresent(builder::mainCpvCode);
+
         // type, noticeName
         final List<String> s = content.select("h2").stream()
                 .map(e -> e.childNodes())
@@ -140,17 +153,37 @@ public class ScrapeTest {
                 .map(String::trim)
                 .collect(Collectors.toList());
 
-        builder.type(s.get(0));
+        builder.type(s.get(0).substring(0, s.get(0).length() - 1));
         builder.noticeName(s.get(2));
 
         // noticeDescription
-        content.select("dt:contains(II.1.4) ~ dd").stream()
+        content.select("dt:contains(II.1.4 Lyhyt kuvaus) ~ dd").stream()
                 .map(Element::text)
                 .findFirst()
                 .ifPresent(builder::noticeDescription);
 
         // type = Kansallinen hankintailmoitus
         content.select("dt:contains(Hankinnan kuvaus) ~ dd").stream()
+                .map(Element::text)
+                .findFirst()
+                .ifPresent(builder::noticeDescription);
+
+        content.select("dt:contains(II.1.5 Sopimuksen tai hankinnan \\(hankintojen\\) lyhyt kuvaus) ~ dd").stream()
+                .map(Element::text)
+                .findFirst()
+                .ifPresent(builder::noticeDescription);
+
+        content.select("dt:contains(II.4 Lyhyt kuvaus tavarahankintojen tai palvelujen luonteesta ja määrästä) ~ dd").stream()
+                .map(Element::text)
+                .findFirst()
+                .ifPresent(builder::noticeDescription);
+
+        content.select("dt:contains(II.1.5 Lyhyt kuvaus) ~ dd").stream()
+                .map(Element::text)
+                .findFirst()
+                .ifPresent(builder::noticeDescription);
+
+        content.select("dt:contains(II.1.4 Sopimuksen tai hankinnan \\(hankintojen\\) lyhyt kuvaus) ~ dd").stream()
                 .map(Element::text)
                 .findFirst()
                 .ifPresent(builder::noticeDescription);
@@ -162,50 +195,19 @@ public class ScrapeTest {
     }
 
     @Test
-    public void testMap() throws Exception {
-        Arrays.asList("1", "2", "3").stream()
-                .map(Object::toString)
-                .map(s -> null)
-                .forEach(System.out::println);
-    }
-
-    @Test
-    public void testDetailScrape2() throws Exception {
-        final Optional<ScrapedNotice> sn = parseNotice(detailHtml.getInputStream(), "http://www.hankintailmoitukset.fi/fi/notice/view/2014-011132/");
-        LOG.debug(sn.toString());
-    }
-
-
-    @Test
     public void testDetailScrape() throws Exception {
-        final Document doc = Jsoup.parse(detailHtml.getInputStream(), "UTF-8", "http://www.hankintailmoitukset.fi/fi/notice/view/2014-011132/");
-
-        final Element content = doc.select("div#mainContent").first();
-
-        LOG.debug(content.select("h2").first().childNodes().toString());
-
-        content.select("h2").first().childNodes().stream().forEach(n -> LOG.debug(n.toString()));
-
-        final List<Node> s = content.select("h2").stream()
-                .map(Node::childNodes)
-                .flatMap(l -> l.stream())
-                .collect(Collectors.toList());
-
-        final Elements notes = content.select("div.note");
-        if (!notes.isEmpty()) {
-            LOG.debug("note: " + notes.first().text());
-        }
-
-        for (final Element e : content.select("dt")) {
-            final Matcher m = TITLE_PATTERN.matcher(e.text());
-            if (m.find()) {
-                LOG.debug(m.group(1));
-                LOG.debug(m.group(2));
-            }
-            final Element dd = e.nextElementSibling();
-//            LOG.debug(dd.children().toString());
-        }
-
+        Arrays.stream(postsDirectory.getFile().listFiles())
+                .forEach(f -> {
+                    try (final InputStream fis = new FileInputStream(f)) {
+                        parseNotice(fis, "/fi/notice/view/2014-011132/").ifPresent(sn -> {
+                            if (sn.mainCpvCode == null) {
+                                LOG.debug(f.getName() + " " + sn.type + " " + sn.noticeName);
+                            }
+                        });
+                    } catch (final IOException e) {
+                        // ignore
+                    }
+                });
     }
 
 }
