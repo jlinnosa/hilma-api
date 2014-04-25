@@ -46,9 +46,6 @@ public class ScrapeTest {
     @Value("classpath:www/all.html")
     private Resource allHtml;
 
-    @Value("classpath:www/posts/2014-011132.html")
-    private Resource detailHtml;
-
     @Value("classpath:www/posts")
     private Resource postsDirectory;
 
@@ -70,8 +67,8 @@ public class ScrapeTest {
                 .forEach(f -> {
                     try (final InputStream fis = new FileInputStream(f)) {
                         ScrapeService.parseNotice(fis, "/fi/notice/view/2014-011132/").ifPresent(sn -> {
-                            if (sn.closes == null) {
-                                LOG.debug(f.getName() + " " + sn.type + " " + sn.published + " " + sn.noticeName);
+                            if (sn.organizationName == null) {
+                                LOG.debug(sn.id + " " + sn.type + " " + sn.published + " " + sn.noticeName);
                             }
                         });
                     } catch (final IOException e) {

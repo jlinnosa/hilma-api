@@ -8,6 +8,8 @@ import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Entities;
 import org.jsoup.nodes.Node;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -27,6 +29,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class ScrapeService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ScrapeService.class);
 
     private static final Pattern CPV_PATTERN = Pattern.compile("\\(([0-9\\-]*)\\)");
 
@@ -88,6 +92,9 @@ public class ScrapeService {
         return ret;
     }
 
+    /**
+     * There is still some regrettable magic in here, and different types all mixed together.
+     */
     public static Optional<ScrapedNotice> parseNotice(final InputStream is, final String link) throws IOException {
         final Document doc = Jsoup.parse(is, "UTF-8", link);
         doc.outputSettings().escapeMode(Entities.EscapeMode.xhtml);
@@ -98,6 +105,11 @@ public class ScrapeService {
         final Element content = doc.select("div#mainContent").first();
 
         // id
+        doc.select("form#login").stream()
+                .map(e -> e.attr("action"))
+                .map((String a) -> a.substring(50, a.length() - 1))
+                .findFirst()
+                .ifPresent(builder::id);
 
         // published
         content.select("div#datePublished").stream()
@@ -188,6 +200,15 @@ public class ScrapeService {
 
 
         // organizationName
+        content.select("dt:contains(I.1 Nimi, osoite ja yhteyspiste) + dd td:contains(Virallinen nimi) + td").stream()
+                .map(Element::text)
+                .findFirst()
+                .ifPresent(builder::organizationName);
+
+        content.select("dt:contains(Hankintayksikön yhteystiedot) + dd td:contains(Hankintayksikkö) + td").stream()
+                .map(Element::text)
+                .findFirst()
+                .ifPresent(builder::organizationName);
 
         return Optional.of(builder.build());
     }
