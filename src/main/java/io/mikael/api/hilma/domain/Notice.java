@@ -3,8 +3,10 @@ package io.mikael.api.hilma.domain;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.experimental.Builder;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -16,7 +18,8 @@ import java.time.LocalDateTime;
 @Data @NoArgsConstructor @AllArgsConstructor
 @Builder(builderClassName = "Builder")
 @Entity @Table(name = "scraped_notices")
-public class ScrapedNotice {
+@ToString(exclude="html")
+public class Notice {
 
     /** The HILMA-specific notice ID of the form "2014-011132". */
     @Id
@@ -26,6 +29,7 @@ public class ScrapedNotice {
     private String link;
 
     /** Original scraped HTML. */
+    @Column(columnDefinition="TEXT")
     private String html;
 
     /** FI: Kansallinen hankintailmoitus, Hankintailmoitus, ... */
@@ -41,14 +45,18 @@ public class ScrapedNotice {
     private String mainCpvCode;
 
     /** FI: II.1.1 Hankintaviranomaisen sopimukselle antama nimi */
+    @Column(columnDefinition="TEXT")
     private String noticeName;
 
     /** FI: II.1.5 Sopimuksen tai hankinnan (hankintojen) lyhyt kuvaus */
+    @Column(columnDefinition="TEXT")
     private String noticeDescription;
 
     /** FI: Virallinen nimi */
+    @Column(columnDefinition="TEXT")
     private String organizationName;
 
+    @Column(columnDefinition="TEXT")
     private String note;
 
 }

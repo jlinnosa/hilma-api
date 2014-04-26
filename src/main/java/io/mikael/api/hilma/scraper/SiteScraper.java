@@ -1,7 +1,7 @@
 package io.mikael.api.hilma.scraper;
 
 import io.mikael.api.hilma.domain.ScrapedLink;
-import io.mikael.api.hilma.domain.ScrapedNotice;
+import io.mikael.api.hilma.domain.Notice;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -89,11 +89,11 @@ public class SiteScraper {
     /**
      * There is still some regrettable magic in here, and different types all mixed together.
      */
-    public static ScrapedNotice.Builder parseNotice(final Document doc) {
+    public static Notice.Builder parseNotice(final Document doc) {
         doc.outputSettings().escapeMode(Entities.EscapeMode.xhtml);
 
         // link, html
-        final ScrapedNotice.Builder builder = ScrapedNotice.builder().html(doc.outerHtml());
+        final Notice.Builder builder = Notice.builder().html(doc.outerHtml());
 
         final Element content = doc.select("div#mainContent").first();
 
@@ -140,6 +140,17 @@ public class SiteScraper {
                 .findFirst()
                 .ifPresent(builder::mainCpvCode);
 
+        // organizationName
+
+        final String organizationNameSelector = String.join(",", Arrays.asList(
+                "dt:contains(I.1 Nimi, osoite ja yhteyspiste) + dd td:contains(Virallinen nimi) + td",
+                "dt:contains(Hankintayksikön yhteystiedot) + dd td:contains(Hankintayksikkö) + td"
+        ));
+
+        final Optional<String> oon = content.select(organizationNameSelector).stream()
+                .map(Element::text).findFirst();
+        oon.ifPresent(builder::organizationName);
+
         // type, noticeName
         final List<String> s = content.select("h2").stream()
                 .map(e -> e.childNodes())
@@ -149,7 +160,15 @@ public class SiteScraper {
                 .collect(Collectors.toList());
 
         builder.type(s.get(0).substring(0, s.get(0).length() - 1));
-        builder.noticeName(s.get(2));
+
+        final String rawName = s.get(2);
+        if (oon.isPresent() && rawName.startsWith(oon.get())
+                && rawName.length() > oon.get().length() + 3)
+        {
+            builder.noticeName(rawName.substring(oon.get().length() + 3));
+        } else {
+            builder.noticeName(rawName);
+        }
 
         final String noticeDescriptionSelector = String.join(",", Arrays.asList(
                 "dt:contains(II.1.4 Lyhyt kuvaus) ~ dd",
@@ -162,16 +181,6 @@ public class SiteScraper {
 
         content.select(noticeDescriptionSelector).stream()
                 .map(Element::text).findFirst().ifPresent(builder::noticeDescription);
-
-        // organizationName
-
-        final String organizationNameSelector = String.join(",", Arrays.asList(
-                "dt:contains(I.1 Nimi, osoite ja yhteyspiste) + dd td:contains(Virallinen nimi) + td",
-                "dt:contains(Hankintayksikön yhteystiedot) + dd td:contains(Hankintayksikkö) + td"
-        ));
-
-        content.select(organizationNameSelector).stream()
-                .map(Element::text).findFirst().ifPresent(builder::organizationName);
 
         return builder;
     }

@@ -1,15 +1,12 @@
 package io.mikael.api.hilma;
 
+import io.mikael.api.hilma.domain.NoticeDao;
 import io.mikael.api.hilma.domain.ScrapedLink;
-import io.mikael.api.hilma.domain.ScrapedNotice;
+import io.mikael.api.hilma.domain.Notice;
 import io.mikael.api.hilma.scraper.SiteScraper;
 import io.mikael.api.hilma.service.ScrapeService;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.Entities;
-import org.jsoup.nodes.Node;
-import org.jsoup.select.Elements;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -25,14 +22,8 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
-import java.util.function.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -57,6 +48,9 @@ public class ScrapeTest {
     @Autowired
     private SiteScraper siteScraper;
 
+    @Autowired
+    private NoticeDao dao;
+
     @Test
     public void testListScrape() throws IOException {
         final List<ScrapedLink> links = SiteScraper.parseNewLinks(allHtml.getInputStream());
@@ -75,14 +69,17 @@ public class ScrapeTest {
                 .forEach(f -> {
                     try (final InputStream fis = new FileInputStream(f)) {
                         final Document doc = Jsoup.parse(fis, "UTF-8", "/fi/notice/view/2014-011132/");
-                        final ScrapedNotice notice = SiteScraper.parseNotice(doc).build();
+                        final Notice notice = SiteScraper.parseNotice(doc).build();
                         if (notice.getCloses() == null) {
-                            LOG.debug(notice.getId() + " " + notice.getType() + " " + notice.getPublished() + " " + notice.getNoticeName());
+                            LOG.debug(notice.getId() + " " + notice.getType() + " " + notice.getPublished()
+                                    + " " + notice.getNoticeName());
                         }
+                        dao.save(notice);
                     } catch (final IOException e) {
                         // ignore
                     }
                 });
+        LOG.debug("from dao: " + dao.findOne("2014-012067"));
     }
 
 }
