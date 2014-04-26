@@ -100,7 +100,7 @@ public class ScrapeService {
         doc.outputSettings().escapeMode(Entities.EscapeMode.xhtml);
 
         // link, html
-        final ScrapedNotice.Builder builder = ScrapedNotice.builder()/*.html(doc.outerHtml())*/.link(link);
+        final ScrapedNotice.Builder builder = ScrapedNotice.builder().html(doc.outerHtml()).link(link);
 
         final Element content = doc.select("div#mainContent").first();
 
@@ -119,31 +119,23 @@ public class ScrapeService {
                 .ifPresent(o -> o.ifPresent(builder::published));
 
         // closes
-        content.select("dt:contains(Tarjoukset tai osallistumishakemukset on toimitettava hankintayksikölle viimeistään) ~ dd").stream()
-                .map(Element::text)
-                .map(ScrapeService::parseLocalDateTime)
-                .findFirst()
-                .ifPresent(o -> o.ifPresent(builder::closes));
+        final String closesSelector = String.join(",", Arrays.asList(
+                "dt:contains(Tarjoukset tai osallistumishakemukset on toimitettava hankintayksikölle viimeistään) ~ dd",
+                "dt:contains(IV.3.4 Tarjousten vastaanottamisen määräaika) ~ dd",
+                "dt:contains(IV.3.4 Osallistumishakemusten vastaanottamisen määräaika) ~ dd"
+        ));
 
-        content.select("dt:contains(IV.3.4 Tarjousten vastaanottamisen määräaika) ~ dd").stream()
-                .map(Element::text)
-                .map(ScrapeService::parseLocalDateTime)
-                .findFirst()
-                .ifPresent(o -> o.ifPresent(builder::closes));
-
-        content.select("dt:contains(IV.3.4 Osallistumishakemusten vastaanottamisen määräaika) ~ dd").stream()
-                .map(Element::text)
-                .map(ScrapeService::parseLocalDateTime)
-                .findFirst()
-                .ifPresent(o -> o.ifPresent(builder::closes));
+        content.select(closesSelector).stream()
+                .map(Element::text).map(ScrapeService::parseLocalDateTime)
+                .findFirst().ifPresent(o -> o.ifPresent(builder::closes));
 
         // note
         content.select("div.note").stream()
                 .map(Element::text).findFirst().ifPresent(builder::note);
 
         // mainCpvCode
-        final Elements es = content.select("table.CPV:has(tr > td > strong)");
-        es.select("tr + tr > td").stream()
+        final Elements cpvTable = content.select("table.CPV:has(tr > td > strong)");
+        cpvTable.select("tr + tr > td").stream()
                 .map(Element::text)
                 .map(ScrapeService::findCode)
                 .findFirst()
@@ -166,49 +158,27 @@ public class ScrapeService {
         builder.type(s.get(0).substring(0, s.get(0).length() - 1));
         builder.noticeName(s.get(2));
 
-        // noticeDescription
-        content.select("dt:contains(II.1.4 Lyhyt kuvaus) ~ dd").stream()
-                .map(Element::text)
-                .findFirst()
-                .ifPresent(builder::noticeDescription);
+        final String noticeDescriptionSelector = String.join(",", Arrays.asList(
+                "dt:contains(II.1.4 Lyhyt kuvaus) ~ dd",
+                "dt:contains(Hankinnan kuvaus) ~ dd",
+                "dt:contains(II.1.5 Sopimuksen tai hankinnan \\(hankintojen\\) lyhyt kuvaus) ~ dd",
+                "dt:contains(II.4 Lyhyt kuvaus tavarahankintojen tai palvelujen luonteesta ja määrästä) ~ dd",
+                "dt:contains(II.1.5 Lyhyt kuvaus) ~ dd",
+                "dt:contains(II.1.4 Sopimuksen tai hankinnan \\(hankintojen\\) lyhyt kuvaus) ~ dd"
+        ));
 
-        // type = Kansallinen hankintailmoitus
-        content.select("dt:contains(Hankinnan kuvaus) ~ dd").stream()
-                .map(Element::text)
-                .findFirst()
-                .ifPresent(builder::noticeDescription);
-
-        content.select("dt:contains(II.1.5 Sopimuksen tai hankinnan \\(hankintojen\\) lyhyt kuvaus) ~ dd").stream()
-                .map(Element::text)
-                .findFirst()
-                .ifPresent(builder::noticeDescription);
-
-        content.select("dt:contains(II.4 Lyhyt kuvaus tavarahankintojen tai palvelujen luonteesta ja määrästä) ~ dd").stream()
-                .map(Element::text)
-                .findFirst()
-                .ifPresent(builder::noticeDescription);
-
-        content.select("dt:contains(II.1.5 Lyhyt kuvaus) ~ dd").stream()
-                .map(Element::text)
-                .findFirst()
-                .ifPresent(builder::noticeDescription);
-
-        content.select("dt:contains(II.1.4 Sopimuksen tai hankinnan \\(hankintojen\\) lyhyt kuvaus) ~ dd").stream()
-                .map(Element::text)
-                .findFirst()
-                .ifPresent(builder::noticeDescription);
-
+        content.select(noticeDescriptionSelector).stream()
+                .map(Element::text).findFirst().ifPresent(builder::noticeDescription);
 
         // organizationName
-        content.select("dt:contains(I.1 Nimi, osoite ja yhteyspiste) + dd td:contains(Virallinen nimi) + td").stream()
-                .map(Element::text)
-                .findFirst()
-                .ifPresent(builder::organizationName);
 
-        content.select("dt:contains(Hankintayksikön yhteystiedot) + dd td:contains(Hankintayksikkö) + td").stream()
-                .map(Element::text)
-                .findFirst()
-                .ifPresent(builder::organizationName);
+        final String organizationNameSelector = String.join(",", Arrays.asList(
+                "dt:contains(I.1 Nimi, osoite ja yhteyspiste) + dd td:contains(Virallinen nimi) + td",
+                "dt:contains(Hankintayksikön yhteystiedot) + dd td:contains(Hankintayksikkö) + td"
+        ));
+
+        content.select(organizationNameSelector).stream()
+                .map(Element::text).findFirst().ifPresent(builder::organizationName);
 
         return Optional.of(builder.build());
     }
