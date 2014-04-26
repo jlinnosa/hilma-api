@@ -2,6 +2,7 @@ package io.mikael.api.hilma;
 
 import io.mikael.api.hilma.domain.ScrapedLink;
 import io.mikael.api.hilma.domain.ScrapedNotice;
+import io.mikael.api.hilma.scraper.SiteScraper;
 import io.mikael.api.hilma.service.ScrapeService;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -13,6 +14,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.core.io.Resource;
@@ -49,9 +51,15 @@ public class ScrapeTest {
     @Value("classpath:www/posts")
     private Resource postsDirectory;
 
+    @Autowired
+    private ScrapeService scrapeService;
+
+    @Autowired
+    private SiteScraper siteScraper;
+
     @Test
     public void testListScrape() throws IOException {
-        final List<ScrapedLink> links = ScrapeService.parseNewLinks(allHtml.getInputStream());
+        final List<ScrapedLink> links = SiteScraper.parseNewLinks(allHtml.getInputStream());
         assertEquals(links.size(), 3161);
         for (final ScrapedLink l : links) {
             assertNotNull(l.published);
@@ -66,11 +74,11 @@ public class ScrapeTest {
         Arrays.stream(postsDirectory.getFile().listFiles())
                 .forEach(f -> {
                     try (final InputStream fis = new FileInputStream(f)) {
-                        ScrapeService.parseNotice(fis, "/fi/notice/view/2014-011132/").ifPresent(sn -> {
-                            if (sn.organizationName == null) {
-                                LOG.debug(sn.id + " " + sn.type + " " + sn.published + " " + sn.noticeName);
-                            }
-                        });
+                        final Document doc = Jsoup.parse(fis, "UTF-8", "/fi/notice/view/2014-011132/");
+                        final ScrapedNotice notice = SiteScraper.parseNotice(doc).build();
+                        if (notice.getCloses() == null) {
+                            LOG.debug(notice.getId() + " " + notice.getType() + " " + notice.getPublished() + " " + notice.getNoticeName());
+                        }
                     } catch (final IOException e) {
                         // ignore
                     }
