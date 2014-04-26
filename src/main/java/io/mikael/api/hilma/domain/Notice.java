@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.Builder;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -36,9 +37,11 @@ public class Notice {
     private String type;
 
     /** FI: VI.5 Tämän ilmoituksen lähettämispäivä */
+    @Type(type="org.jadira.usertype.dateandtime.threeten.PersistentLocalDateTime")
     private LocalDateTime published;
 
     /** FI: IV.3.4 Tarjousten vastaanottamisen määräaika */
+    @Type(type="org.jadira.usertype.dateandtime.threeten.PersistentLocalDateTime")
     private LocalDateTime closes;
 
     /** FI: II.1.6 Yhteinen hankintanimikkeistö (CPV): Pääkohde */
