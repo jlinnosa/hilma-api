@@ -1,5 +1,6 @@
 package io.mikael.api.hilma.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -31,6 +32,7 @@ public class Notice {
 
     /** Original scraped HTML. */
     @Column(columnDefinition="TEXT")
+    @JsonIgnore
     private String html;
 
     /** FI: Kansallinen hankintailmoitus, Hankintailmoitus, ... */

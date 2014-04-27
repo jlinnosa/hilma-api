@@ -26,6 +26,8 @@ import java.util.stream.Collectors;
 @Component
 public class SiteScraper {
 
+    private static final int NOTICE_LINK_PREID = 50;
+
     private static final Pattern CPV_PATTERN = Pattern.compile("\\(([0-9\\-]*)\\)");
 
     private static final Pattern TITLE_PATTERN = Pattern.compile("([IVXLCDM]*\\.[0-9]*(?:\\.[0-9]*)) (.*)");
@@ -60,17 +62,18 @@ public class SiteScraper {
     /**
      * Parse a list of new scraped links out of a HTML InputStream.
      */
-    public static List<ScrapedLink> parseNewLinks(final InputStream is) throws IOException {
+    public static List<ScrapedLink> parseNewLinks(final Document doc) throws IOException {
         final List<ScrapedLink> ret = new ArrayList<>();
-        final Document doc = Jsoup.parse(is, "UTF-8", "");
         for (final Element e : doc.select("tr:has(td)")) {
             final Elements data = e.select("td");
             if (data.size() == 4) {
                 final Element linkElement = data.get(3).children().first();
+                final String link = linkElement.attr("href");
                 final ScrapedLink.Builder bld = ScrapedLink.builder()
-                        .link(linkElement.attr("href"))
-                        .name(linkElement.text())
+                        .id(link.substring(NOTICE_LINK_PREID, link.length() - 1))
+                        .link(link).name(linkElement.text())
                         .type(data.get(3).select("span.meta").first().text());
+
                 final Optional<LocalDateTime> published = parseLocalDateTime(data.get(1).text());
                 if (published.isPresent()) {
                     bld.published(published.get());
@@ -100,7 +103,7 @@ public class SiteScraper {
         // id
         doc.select("form#login").stream()
                 .map(e -> e.attr("action"))
-                .map((String a) -> a.substring(50, a.length() - 1))
+                .map((String a) -> a.substring(NOTICE_LINK_PREID, a.length() - 1))
                 .findFirst()
                 .ifPresent(builder::id);
 

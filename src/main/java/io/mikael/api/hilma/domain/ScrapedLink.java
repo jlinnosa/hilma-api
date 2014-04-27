@@ -14,6 +14,8 @@ import java.time.LocalDateTime;
 @Builder(builderClassName = "Builder")
 public class ScrapedLink {
 
+    public String id;
+
     /** FI: Julkaistu. */
     public LocalDateTime published;
 

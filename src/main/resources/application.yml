@@ -7,6 +7,18 @@ server:
   sessionTimeout: 0
 
 ---
+spring.profiles: default
+
+spring:
+  datasource:
+    platform: h2
+    url: jdbc:h2:./devdb
+  jpa:
+    database: H2
+    generate-ddl: false
+    hibernate.ddl-auto: none
+
+---
 spring.profiles: test
 
 server:
@@ -27,4 +39,16 @@ spring.profiles: heroku
 server.port: ${PORT}
 server.address: 0.0.0.0
 
-spring.main.show-banner: false
+spring:
+  main:
+    web-environment: true
+    show-banner: false
+    log-startup-info: false
+#  datasource:
+#    url: ${DATABASE_URL}
+#    platform: postgresql
+#    driverClassName: org.postgresql.Driver
+  jpa:
+    database: POSTGRESQL
+    generate-ddl: false
+    hibernate.ddl-auto: none
