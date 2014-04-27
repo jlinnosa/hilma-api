@@ -32,6 +32,11 @@ spring:
   main:
     show-banner: false
     log-startup-info: false
+  datasource:
+    platform: h2
+    url: "jdbc:h2:mem:"
+  jpa:
+    database: H2
 
 ---
 spring.profiles: heroku
