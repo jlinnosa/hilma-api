@@ -31,12 +31,14 @@ management.port: -1
 spring:
   main:
     show-banner: false
-    log-startup-info: false
+    log-startup-info: true
   datasource:
     platform: h2
     url: "jdbc:h2:mem:"
   jpa:
     database: H2
+    generate-ddl: true
+    hibernate.ddl-auto: create-drop
 
 ---
 spring.profiles: heroku
