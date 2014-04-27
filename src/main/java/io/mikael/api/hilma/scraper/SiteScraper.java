@@ -15,10 +15,7 @@ import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -40,17 +37,17 @@ public class SiteScraper {
      * HILMA has several suprising alternative date formats.
      */
     private static Optional<LocalDateTime> parseLocalDateTime(final String input) {
-        if (input == null || input.length() == 0) {
+        if (input == null || input.isEmpty()) {
             return Optional.empty();
         }
-        for (final DateTimeFormatter f : FORMATTERS) {
-            try {
-                return Optional.of(LocalDateTime.parse(input, f));
-            } catch (final DateTimeParseException e) {
-                // ignore
-            }
-        }
-        return Optional.empty();
+        return FORMATTERS.stream().map(f -> {
+                    try {
+                        return LocalDateTime.parse(input, f);
+                    } catch (final DateTimeParseException e) {
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull).findFirst();
     }
 
     private static String findCode(final String text) {

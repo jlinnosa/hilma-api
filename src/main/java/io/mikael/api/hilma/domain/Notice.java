@@ -1,6 +1,8 @@
 package io.mikael.api.hilma.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -47,18 +49,22 @@ public class Notice {
     private LocalDateTime closes;
 
     /** FI: II.1.6 Yhteinen hankintanimikkeistö (CPV): Pääkohde */
+    @JsonProperty("cpv")
     private String mainCpvCode;
 
     /** FI: II.1.1 Hankintaviranomaisen sopimukselle antama nimi */
     @Column(columnDefinition="TEXT")
+    @JsonProperty("name")
     private String noticeName;
 
     /** FI: II.1.5 Sopimuksen tai hankinnan (hankintojen) lyhyt kuvaus */
     @Column(columnDefinition="TEXT")
+    @JsonProperty("description")
     private String noticeDescription;
 
     /** FI: Virallinen nimi */
     @Column(columnDefinition="TEXT")
+    @JsonProperty("organization")
     private String organizationName;
 
     @Column(columnDefinition="TEXT")
