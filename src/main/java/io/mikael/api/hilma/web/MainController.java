@@ -51,10 +51,4 @@ public class MainController {
         return new ResponseEntity<>(HttpStatus.I_AM_A_TEAPOT);
     }
 
-    @RequestMapping("/message")
-    public ResponseEntity<String> sendMessage(final @RequestParam("msg") String msg) {
-        template.convertAndSend("/topic/hilma.foo", msg);
-        return new ResponseEntity<>("OK " + msg.length(), HttpStatus.OK);
-    }
-
 }
