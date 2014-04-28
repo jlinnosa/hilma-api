@@ -1,0 +1,22 @@
+<html>
+<head>
+    <title>HILMAT PIHALLE</title>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.1/stomp.js" ></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/sockjs-client/0.3.4/sockjs.min.js" ></script>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-2.1.0.min.js" ></script>
+
+</head>
+<body>
+    <p>Hello, world, from HTML!</p>
+    <div id="error">asdf</div>
+
+    <script type="text/javascript">
+        var socket = new SockJS("/hilma");
+        var stompClient = Stomp.over(socket);
+        stompClient.connect({}, function(frame) {
+            $('#error').html("testing");
+        })
+    </script>
+
+</body>
+</html>

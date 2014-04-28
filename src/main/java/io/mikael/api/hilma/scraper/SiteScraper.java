@@ -1,8 +1,7 @@
 package io.mikael.api.hilma.scraper;
 
-import io.mikael.api.hilma.domain.ScrapedLink;
 import io.mikael.api.hilma.domain.Notice;
-import org.jsoup.Jsoup;
+import io.mikael.api.hilma.domain.ScrapedLink;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Entities;
@@ -11,7 +10,6 @@ import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;

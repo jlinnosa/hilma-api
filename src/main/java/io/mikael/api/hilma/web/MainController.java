@@ -5,15 +5,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.*;
 import java.io.IOException;
 
 @Controller
 public class MainController {
+
+    @Autowired
+    private SimpMessagingTemplate template;
 
     @Autowired
     private ScrapeService ss;
@@ -57,6 +62,12 @@ public class MainController {
     @ExceptionHandler(IOException.class)
     public ResponseEntity<String> handleIOException(IOException ex) {
         return new ResponseEntity<>(HttpStatus.I_AM_A_TEAPOT);
+    }
+
+    @RequestMapping("/message")
+    public ResponseEntity<String> sendMessage(final @RequestParam("msg") String msg) {
+        template.convertAndSend(msg);
+        return new ResponseEntity<>("OK " + msg.length(), HttpStatus.OK);
     }
 
 }
