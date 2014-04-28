@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 @Component
 public class SiteScraper {
 
-    private static final int NOTICE_LINK_PREID = 50;
+    private static final Pattern LINK_ID_PATTERN = Pattern.compile("/([0-9]{4}-[0-9]{6})/");
 
     private static final Pattern CPV_PATTERN = Pattern.compile("\\(([0-9\\-]*)\\)");
 
@@ -54,6 +54,15 @@ public class SiteScraper {
         return m.group(1);
     }
 
+    private static Matcher find(final String text, final Pattern pattern) {
+        final Matcher ret = pattern.matcher(text);
+        if (ret.find()) {
+            return ret;
+        } else {
+            return null;
+        }
+    }
+
     /**
      * Parse a list of new scraped links out of a HTML InputStream.
      */
@@ -65,7 +74,7 @@ public class SiteScraper {
                 final Element linkElement = data.get(3).children().first();
                 final String link = linkElement.attr("href");
                 final ScrapedLink.Builder bld = ScrapedLink.builder()
-                        .id(link.substring(NOTICE_LINK_PREID, link.length() - 1))
+                        .id(find(link, LINK_ID_PATTERN).group(1))
                         .link(link).name(linkElement.text())
                         .type(data.get(3).select("span.meta").first().text());
 
@@ -98,7 +107,8 @@ public class SiteScraper {
         // id
         doc.select("form#login").stream()
                 .map(e -> e.attr("action"))
-                .map((String a) -> a.substring(NOTICE_LINK_PREID, a.length() - 1))
+                .map(action -> find(action, LINK_ID_PATTERN).group(1))
+                .filter(Objects::nonNull)
                 .findFirst()
                 .ifPresent(builder::id);
 
