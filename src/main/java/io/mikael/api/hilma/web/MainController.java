@@ -23,19 +23,6 @@ public class MainController {
     @Autowired
     private ScrapeService ss;
 
-    @FunctionalInterface
-    private static interface LambdaFilter extends Filter {
-        @Override
-        public void doFilter(ServletRequest request, ServletResponse response,
-                             FilterChain chain) throws IOException, ServletException;
-
-        @Override
-        default public void init(FilterConfig filterConfig) throws ServletException {}
-
-        @Override
-        default public void destroy() {}
-    }
-
     /**
      * We want every request/response pair to be handled as UTF-8, and every response identify itself as UTF-8.
      */
@@ -66,7 +53,7 @@ public class MainController {
 
     @RequestMapping("/message")
     public ResponseEntity<String> sendMessage(final @RequestParam("msg") String msg) {
-        template.convertAndSend(msg);
+        template.convertAndSend("/topic/hilma.foo", msg);
         return new ResponseEntity<>("OK " + msg.length(), HttpStatus.OK);
     }
 
