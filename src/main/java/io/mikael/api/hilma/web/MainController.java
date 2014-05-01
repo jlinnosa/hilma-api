@@ -3,7 +3,9 @@ package io.mikael.api.hilma.web;
 import io.mikael.api.hilma.service.ScrapeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
@@ -35,9 +37,9 @@ public class MainController {
         };
     }
 
-    @RequestMapping("/")
+    @RequestMapping(value = "/", produces = MediaType.TEXT_HTML_VALUE)
     public ResponseEntity<String> welcome() {
-        return new ResponseEntity<>("Hello!", HttpStatus.OK);
+        return new ResponseEntity<>("<html><body>Hello!</body></html>", HttpStatus.OK);
     }
 
     @RequestMapping("/fetch")
