@@ -116,8 +116,8 @@ public class SiteScraper {
         content.select("div#datePublished").stream()
                 .map(Element::text)
                 .map(SiteScraper::parseLocalDateTime)
-                .findFirst()
-                .ifPresent(o -> o.ifPresent(builder::published));
+                .filter(Optional::isPresent).map(Optional::get)
+                .findFirst().ifPresent(builder::published);
 
         // closes
         final String closesSelector = String.join(",", Arrays.asList(
@@ -128,7 +128,8 @@ public class SiteScraper {
 
         content.select(closesSelector).stream()
                 .map(Element::text).map(SiteScraper::parseLocalDateTime)
-                .findFirst().ifPresent(o -> o.ifPresent(builder::closes));
+                .filter(Optional::isPresent).map(Optional::get)
+                .findFirst().ifPresent(builder::closes);
 
         // note
         content.select("div.note").stream()
