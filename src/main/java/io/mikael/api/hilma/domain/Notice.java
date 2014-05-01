@@ -30,7 +30,7 @@ public class Notice {
     private String link;
 
     /** Original scraped HTML. */
-    @Column(columnDefinition="VARCHAR(32000)")
+    @Column(columnDefinition="VARCHAR")
     @JsonIgnore
     private String html;
 
@@ -50,21 +50,21 @@ public class Notice {
     private String mainCpvCode;
 
     /** FI: II.1.1 Hankintaviranomaisen sopimukselle antama nimi */
-    @Column(columnDefinition="VARCHAR(1024)")
+    @Column(columnDefinition="VARCHAR")
     @JsonProperty("name")
     private String noticeName;
 
     /** FI: II.1.5 Sopimuksen tai hankinnan (hankintojen) lyhyt kuvaus */
-    @Column(columnDefinition="VARCHAR(32000)")
+    @Column(columnDefinition="VARCHAR")
     @JsonProperty("description")
     private String noticeDescription;
 
     /** FI: Virallinen nimi */
-    @Column(columnDefinition="VARCHAR(1024)")
+    @Column(columnDefinition="VARCHAR")
     @JsonProperty("organization")
     private String organizationName;
 
-    @Column(columnDefinition="TEXT")
+    @Column(columnDefinition="VARCHAR")
     private String note;
 
 }
