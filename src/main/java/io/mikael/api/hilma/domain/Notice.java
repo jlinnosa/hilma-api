@@ -10,10 +10,7 @@ import lombok.ToString;
 import lombok.experimental.Builder;
 import org.hibernate.annotations.Type;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 /**
@@ -33,7 +30,7 @@ public class Notice {
     private String link;
 
     /** Original scraped HTML. */
-    @Column(columnDefinition="TEXT")
+    @Column(columnDefinition="VARCHAR(32000)")
     @JsonIgnore
     private String html;
 
@@ -53,17 +50,17 @@ public class Notice {
     private String mainCpvCode;
 
     /** FI: II.1.1 Hankintaviranomaisen sopimukselle antama nimi */
-    @Column(columnDefinition="TEXT")
+    @Column(columnDefinition="VARCHAR(1024)")
     @JsonProperty("name")
     private String noticeName;
 
     /** FI: II.1.5 Sopimuksen tai hankinnan (hankintojen) lyhyt kuvaus */
-    @Column(columnDefinition="TEXT")
+    @Column(columnDefinition="VARCHAR(32000)")
     @JsonProperty("description")
     private String noticeDescription;
 
     /** FI: Virallinen nimi */
-    @Column(columnDefinition="TEXT")
+    @Column(columnDefinition="VARCHAR(1024)")
     @JsonProperty("organization")
     private String organizationName;
 
