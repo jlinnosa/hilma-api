@@ -66,7 +66,7 @@ public class SiteScraper {
     /**
      * Parse a list of new scraped links out of a HTML InputStream.
      */
-    public static List<ScrapedLink> parseNewLinks(final Document doc) throws IOException {
+    public static List<ScrapedLink> scrapeLinks(final Document doc) throws IOException {
         final List<ScrapedLink> ret = new ArrayList<>();
         for (final Element e : doc.select("tr:has(td)")) {
             final Elements data = e.select("td");
@@ -96,7 +96,7 @@ public class SiteScraper {
     /**
      * There is still some regrettable magic in here, and different types all mixed together.
      */
-    public static Notice.Builder parseNotice(final Document doc) {
+    public static Notice.Builder scrapeNotice(final Document doc) {
         doc.outputSettings().escapeMode(Entities.EscapeMode.xhtml);
 
         // link, html

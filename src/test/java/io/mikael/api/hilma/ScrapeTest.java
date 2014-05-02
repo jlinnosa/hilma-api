@@ -54,7 +54,7 @@ public class ScrapeTest {
     @Test
     public void testListScrape() throws IOException {
         final Document doc = Jsoup.parse(allHtml.getInputStream(), "UTF-8", "");
-        final List<ScrapedLink> links = SiteScraper.parseNewLinks(doc);
+        final List<ScrapedLink> links = SiteScraper.scrapeLinks(doc);
         assertEquals(links.size(), 3161);
         for (final ScrapedLink l : links) {
             assertNotNull(l.published);
@@ -70,7 +70,7 @@ public class ScrapeTest {
                 .forEach(f -> {
                     try (final InputStream fis = new FileInputStream(f)) {
                         final Document doc = Jsoup.parse(fis, "UTF-8", "/fi/notice/view/2014-011132/");
-                        final Notice notice = SiteScraper.parseNotice(doc).build();
+                        final Notice notice = SiteScraper.scrapeNotice(doc).build();
                         if (notice.getCloses() == null) {
                             LOG.debug(notice.getId() + " " + notice.getType() + " " + notice.getPublished()
                                     + " " + notice.getNoticeName());
