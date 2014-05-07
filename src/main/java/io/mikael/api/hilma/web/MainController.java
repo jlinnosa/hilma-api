@@ -37,11 +37,6 @@ public class MainController {
         };
     }
 
-    @RequestMapping(value = "/", produces = MediaType.TEXT_HTML_VALUE)
-    public ResponseEntity<String> welcome() {
-        return new ResponseEntity<>("<html><body>Hello!</body></html>", HttpStatus.OK);
-    }
-
     @RequestMapping("/fetch")
     public ResponseEntity<String> fetch() throws IOException {
         ss.fetchNewNotices();
