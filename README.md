@@ -50,3 +50,8 @@ Unit tests with JUnit and spring-test.
 
 * As a salesperson, I want my ignores to be available at my next session.
 
+* As a salesperson, I want to select interesting notices to be moved to SalesForce.
+
+* As a devops admin, I want to deploy the app on Heroku.
+
+* As a devops admin, I want to monitor the application on New Relic and Papertrail.
