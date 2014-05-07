@@ -63,9 +63,6 @@
         NProgress.inc();
         appModel.loadModel();
         NProgress.inc();
-        appModel.noticeboard().rows().sort(function(left, right) {
-            return left.published == right.published ? 0 : (left.published > right.published ? -1 : 1)
-        });
         console.log("Connected");
         NProgress.done();
 </script>

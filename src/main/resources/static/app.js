@@ -10,6 +10,7 @@ function ApplicationModel(stompClient) {
     stompClient.connect({}, function(frame) {
       stompClient.subscribe("/topic/hilma.*", function(message) {
         self.noticeboard().addNotice(JSON.parse(message.body));
+        self.noticeboard().sort();
       });
       stompClient.subscribe("/user/queue/errors", function(message) {
         self.pushNotification("Error " + message.body);
@@ -25,14 +26,8 @@ function ApplicationModel(stompClient) {
       for (var i = 0; i < notices.length; i++) {
         self.noticeboard().addNotice(notices[i]);
       }
+      self.noticeboard().sort();
     })
-  }
-
-  self.pushNotification = function(text) {
-    self.notifications.push({notification: text});
-    if (self.notifications().length > 5) {
-      self.notifications.shift();
-    }
   }
 }
 
@@ -42,6 +37,11 @@ function NoticeboardModel() {
   self.addNotice = function(notice) {
     self.rows.push(new NoticeRow(notice));
   };
+  self.sort = function() {
+    self.rows.sort(function(left, right) {
+      return left.published == right.published ? 0 : (left.published > right.published ? -1 : 1)
+    });
+  }
 };
 
 function NoticeRow(data) {
