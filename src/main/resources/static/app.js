@@ -20,7 +20,7 @@ function ApplicationModel(stompClient) {
   }
 
   self.loadModel = function() {
-    $.getJSON("/notices?sort=published&size=100", function(data) {
+    $.getJSON("/notices?sort=published,desc&size=100", function(data) {
       var notices = data._embedded.notices;
       for (var i = 0; i < notices.length; i++) {
         self.noticeboard().addNotice(notices[i]);
@@ -40,7 +40,7 @@ function NoticeboardModel() {
   var self = this;
   self.rows = ko.observableArray();
   self.addNotice = function(notice) {
-    self.rows.unshift(new NoticeRow(notice));
+    self.rows.push(new NoticeRow(notice));
   };
 };
 

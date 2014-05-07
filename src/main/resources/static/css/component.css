@@ -76,6 +76,8 @@
 }
 
 .cbp_tmtimeline > li .cbp_tmlabel h3 {
+    font-face: 'Lato';
+    color: #D7B740;
 	margin-top: 0px;
 }
 

@@ -33,9 +33,9 @@
     <div class="main">
         <ul class="cbp_tmtimeline" data-bind="foreach: noticeboard().rows">
             <li>
-                <time class="cbp_tmtime" datetime="2013-04-10 18:30" data-bind="attr: { datetime: published }">
+                <time class="cbp_tmtime" data-bind="attr: { datetime: published }">
                     <span data-bind="text: published.format('D.M.')">4/10/13</span>
-                    <span data-bind="text: published.format('hh:mm')">18:30</span>
+                    <span data-bind="text: published.format('HH:mm')">18:30</span>
                 </time>
                 <div class="cbp_tmicon cbp_tmicon-phone"></div>
                 <div class="cbp_tmlabel">
@@ -64,7 +64,7 @@
         appModel.loadModel();
         NProgress.inc();
         appModel.noticeboard().rows().sort(function(left, right) {
-            return left.published == right.published ? 0 : (left.published < right.published ? -1 : 1)
+            return left.published == right.published ? 0 : (left.published > right.published ? -1 : 1)
         });
         console.log("Connected");
         NProgress.done();
