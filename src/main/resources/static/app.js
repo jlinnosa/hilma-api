@@ -50,11 +50,21 @@ function NoticeRow(data) {
   self.name = data.name;
   self.link = data.link;
   self.type = data.type;
-  self.published = data.published;
-  self.closes = data.closes;
+  self.published = toMoment(data.published);
+  self.closes = toMoment(data.closes);
   self.cpv = data.cpv;
   self.description = data.description;
   self.organization = data.organization;
   self.note = data.note;
 };
 
+function toMoment(input) {
+  if (Object.prototype.toString.call(input) === '[object Array]') {
+    return moment({
+      year: input[0], month: input[1], day: input[2],
+      hour: input[3], minute: input[4]
+    });
+  } else {
+    return moment(input)
+  }
+}

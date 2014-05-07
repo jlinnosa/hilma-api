@@ -1,34 +1,53 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="no-js">
 <head>
-    <meta charset="utf-8">
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HILMAT PIHALLE</title>
-    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+    <script src="http://ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js"></script>
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.1/stomp.js"></script>
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/sockjs-client/0.3.4/sockjs.min.js"></script>
     <script type="text/javascript" src="http://code.jquery.com/jquery-2.1.0.min.js"></script>
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/knockout/3.1.0/knockout-min.js"></script>
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/nprogress/0.1.2/nprogress.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.6.0/moment-with-langs.min.js"></script>
     <link type="text/css" rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/nprogress/0.1.2/nprogress.min.css" />
+
     <script type="text/javascript" src="./app.js"></script>
-    <link type="text/css" rel="stylesheet" href="./style.css" />
+
+    <script type="text/javascript">
+		  WebFont.load({
+		    google: {
+		      families: ['Open Sans', 'Lato']
+		    }
+		  });
+		</script>
+
+    <link rel="stylesheet" type="text/css" href="css/default.css" />
+    <link rel="stylesheet" type="text/css" href="css/component.css" />
+    <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.1/modernizr.min.js"></script>
 </head>
 <body>
-
-<div id="main-content">
-    <div class="alert alert-warning" data-bind="foreach: notifications">
-        <p data-bind="text: notification"></p>
+<div class="container">
+    <div class="main">
+        <ul class="cbp_tmtimeline" data-bind="foreach: noticeboard().rows">
+            <li>
+                <time class="cbp_tmtime" datetime="2013-04-10 18:30" data-bind="attr: { datetime: published }">
+                    <span data-bind="text: published.format('D.M.')">4/10/13</span>
+                    <span data-bind="text: published.format('hh:mm')">18:30</span>
+                </time>
+                <div class="cbp_tmicon cbp_tmicon-phone"></div>
+                <div class="cbp_tmlabel">
+                    <h3>
+                        <span data-bind="text: organization"></span>:
+                        <span data-bind="text: name"></span>
+                    </h3>
+                    <p data-bind="text: description"></p>
+                </div>
+            </li>
+        </ul>
     </div>
-    <table class="table table-striped">
-        <tbody data-bind="foreach: noticeboard().rows">
-        <tr>
-            <td data-bind="text: id"></td>
-            <td data-bind="text: published"></td>
-            <td data-bind="text: name"></td>
-            <td data-bind="text: organization"></td>
-        </tr>
-        </tbody>
-    </table>
 </div>
 
 <script type="text/javascript">
@@ -39,7 +58,7 @@
         ko.applyBindings(appModel);
 
         NProgress.start();
-        appModel.pushNotification("Starting...");
+        console.log("Starting...");
         appModel.connect();
         NProgress.inc();
         appModel.loadModel();
@@ -47,7 +66,7 @@
         appModel.noticeboard().rows().sort(function(left, right) {
             return left.published == right.published ? 0 : (left.published < right.published ? -1 : 1)
         });
-        appModel.pushNotification("Connected");
+        console.log("Connected");
         NProgress.done();
 </script>
 
