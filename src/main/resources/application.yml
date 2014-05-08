@@ -12,6 +12,18 @@ spring.profiles: default
 spring:
   datasource:
     platform: h2
+    url: "jdbc:h2:mem:"
+  jpa:
+    database: H2
+    generate-ddl: true
+    hibernate.ddl-auto: create-drop
+
+---
+spring.profiles: dev-persistent
+
+spring:
+  datasource:
+    platform: h2
     url: jdbc:h2:./devdb
   jpa:
     database: H2

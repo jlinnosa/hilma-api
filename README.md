@@ -10,6 +10,10 @@ Run:
 
     mvn spring-boot:run
 
+Run with a persistent H2 database:
+
+    mvn -Dspring.profiles.active=dev-persistent spring-boot:run
+
 Run with XRebel:
 
     mvn clean package
