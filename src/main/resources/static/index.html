@@ -17,12 +17,12 @@
     <script type="text/javascript" src="./app.js"></script>
 
     <script type="text/javascript">
-		  WebFont.load({
-		    google: {
-		      families: ['Open Sans', 'Lato']
-		    }
-		  });
-		</script>
+        WebFont.load({
+            google: {
+                families: ['Open Sans', 'Lato']
+            }
+        });
+    </script>
 
     <link rel="stylesheet" type="text/css" href="css/default.css" />
     <link rel="stylesheet" type="text/css" href="css/component.css" />
@@ -32,12 +32,12 @@
 <div class="container">
     <div class="main">
         <ul class="cbp_tmtimeline" data-bind="foreach: noticeboard().rows">
-            <li>
+            <li data-bind="attr: { id: id, scpv: cpv.substring(0, 2) }">
                 <time class="cbp_tmtime" data-bind="attr: { datetime: published }">
                     <span data-bind="text: published.format('D.M.')">4/10/13</span>
                     <span data-bind="text: published.format('HH:mm')">18:30</span>
                 </time>
-                <div class="cbp_tmicon cbp_tmicon-phone"></div>
+                <div class="cbp_tmicon" data-bind="text: cpv.substring(0, 2), attr: { title: cpv }"></div>
                 <div class="cbp_tmlabel">
                     <h3>
                         <span data-bind="text: organization"></span>:
@@ -51,6 +51,7 @@
 </div>
 
 <script type="text/javascript">
+    $(function() {
         var socket = new SockJS("/hilma");
         var stompClient = Stomp.over(socket);
 
@@ -65,6 +66,11 @@
         NProgress.inc();
         console.log("Connected");
         NProgress.done();
+
+        $("ul.cbp_tmtimeline").on("click", "div.cbp_tmicon", function (event) {
+            $('li[scpv=' + $(this).text() + ']').toggleClass('uninteresting');
+        });
+    });
 </script>
 
 </body>

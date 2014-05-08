@@ -51,14 +51,13 @@
 }
 
 .cbp_tmtimeline > li .cbp_tmtime span:last-child {
-	font-size: 1.3em;
+	font-size: 1.2em;
 	color: #3594cb;
 }
 
 /* Right content */
 .cbp_tmtimeline > li .cbp_tmlabel {
 	margin: 0 0 15px 25%;
-	background: #3594cb;
 	background: #fff;
 	color: #555;
 	padding: 2em;
@@ -71,14 +70,29 @@
 	border-style: solid;
 }
 
+.cbp_tmtimeline > li .cbp_tmlabel .uninteresting {
+    margin: 0;
+}
+
 .cbp_tmtimeline > li .cbp_tmlabel h2 { 
 	margin-top: 0px;
 }
 
 .cbp_tmtimeline > li .cbp_tmlabel h3 {
     font-face: 'Lato';
-    color: #D7B740;
-	margin-top: 0px;
+    color: #3594cb;
+	margin: 0px;
+}
+
+.uninteresting h3 {
+    font-face: 'Open Sans';
+    color: #aaaaaa;
+    font-size: 13px;
+}
+
+.uninteresting p {
+    display: none;
+    margin: 0;
 }
 
 /* The triangle */

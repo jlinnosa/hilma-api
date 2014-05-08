@@ -61,7 +61,7 @@ function NoticeRow(data) {
 function toMoment(input) {
   if (Object.prototype.toString.call(input) === '[object Array]') {
     return moment({
-      year: input[0], month: input[1], day: input[2],
+      year: input[0], month: input[1] - 1, day: input[2],
       hour: input[3], minute: input[4]
     });
   } else if (input != null) {
@@ -69,3 +69,14 @@ function toMoment(input) {
         .hours(input.hour).minutes(input.minute).seconds(input.second);
   }
 }
+
+ko.bindingHandlers['class'] = {
+    'update': function(element, valueAccessor) {
+        if (element['__ko__previousClassValue__']) {
+            $(element).removeClass(element['__ko__previousClassValue__']);
+        }
+        var value = ko.utils.unwrapObservable(valueAccessor());
+        $(element).addClass(value);
+        element['__ko__previousClassValue__'] = value;
+    }
+};
