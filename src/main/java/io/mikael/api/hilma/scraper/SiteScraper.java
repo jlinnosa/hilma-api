@@ -2,10 +2,13 @@ package io.mikael.api.hilma.scraper;
 
 import io.mikael.api.hilma.domain.Notice;
 import io.mikael.api.hilma.domain.ScrapedLink;
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Entities;
 import org.jsoup.nodes.Node;
+import org.jsoup.safety.Cleaner;
+import org.jsoup.safety.Whitelist;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 
@@ -179,6 +182,8 @@ public class SiteScraper {
             builder.noticeName(rawName);
         }
 
+        final Document cleanDocument = new Cleaner(Whitelist.basic()).clean(doc);
+
         final String noticeDescriptionSelector = String.join(",", Arrays.asList(
                 "dt:contains(II.1.4 Lyhyt kuvaus) ~ dd",
                 "dt:contains(Hankinnan kuvaus) ~ dd",
@@ -188,8 +193,9 @@ public class SiteScraper {
                 "dt:contains(II.1.4 Sopimuksen tai hankinnan \\(hankintojen\\) lyhyt kuvaus) ~ dd"
         ));
 
-        content.select(noticeDescriptionSelector).stream()
-                .map(Element::text).findFirst().ifPresent(builder::noticeDescription);
+        cleanDocument.select(noticeDescriptionSelector).stream()
+                .map(Element::html)
+                .findFirst().ifPresent(builder::noticeDescription);
 
         return builder;
     }
