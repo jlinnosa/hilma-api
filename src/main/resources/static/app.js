@@ -64,7 +64,7 @@ function toMoment(input) {
       year: input[0], month: input[1], day: input[2],
       hour: input[3], minute: input[4]
     });
-  } else {
+  } else if (input != null) {
     return moment(0).year(input.year).month(input.month).date(input.dayOfMonth)
         .hours(input.hour).minutes(input.minute).seconds(input.second);
   }
