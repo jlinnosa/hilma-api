@@ -53,6 +53,26 @@ spring:
     hibernate.ddl-auto: create-drop
 
 ---
+spring.profiles: local-postgresql
+
+server.port: ${PORT:8080}
+server.address: 0.0.0.0
+
+spring:
+  main:
+    web-environment: true
+    show-banner: false
+    log-startup-info: false
+  datasource:
+    url: "jdbc:postgresql:${USER}"
+    platform: postgresql
+    driverClassName: org.postgresql.Driver
+  jpa:
+    database: POSTGRESQL
+    generate-ddl: false
+    hibernate.ddl-auto: update
+
+---
 spring.profiles: heroku
 
 server.port: ${PORT}
