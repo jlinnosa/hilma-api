@@ -26,7 +26,7 @@ Java 8, Maven 3.
 
 ### Architecture
 
-Scrapes data with Jsoup.
+Scrapes data with Jsoup + Java 8 streams and Optional.
 
 Saves it either to a H2 dev database, or a PostgreSQL production database.
 
