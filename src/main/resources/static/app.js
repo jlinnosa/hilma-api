@@ -4,7 +4,24 @@ function ApplicationModel(stompClient) {
 
   self.username = ko.observable();
   self.noticeboard = ko.observable(new NoticeboardModel());
-  self.notifications = ko.observableArray();
+
+  self.toggleIgnore = function(code) {
+    var ig = self.noticeboard().ignores;
+    var found = false;
+    for(var i = 0; i < ig.length; i++) {
+        if (ig[i] == code) {
+            ig.splice(i, 1);
+            found = true;
+            break;
+        }
+    }
+    if (!found) {
+        ig.push(code);
+    }
+    if (Modernizr.localstorage) {
+        localStorage['ignores'] = JSON.stringify(ko.toJS(ig));
+    }
+  };
 
   self.connect = function() {
     stompClient.connect({}, function(frame) {
@@ -18,7 +35,7 @@ function ApplicationModel(stompClient) {
     }, function(error) {
       console.log("STOMP protocol error " + error);
     });
-  }
+  };
 
   self.loadModel = function() {
     $.getJSON("/notices?sort=published,desc&size=100", function(data) {
@@ -28,35 +45,84 @@ function ApplicationModel(stompClient) {
       }
       self.noticeboard().sort();
     })
-  }
+    if (Modernizr.localstorage) {
+        console.log("we have localStorage");
+        var savedIgnores = localStorage['ignores'];
+        if (savedIgnores != null) {
+            self.noticeboard().ignores = ko.observableArray(JSON.parse(savedIgnores));
+        }
+    }
+  };
+
+  self.toggleRowVisibility = function(row) {
+    self.noticeboard().toggleCpvVisibility(row.shortCpv);
+  };
 }
 
 function NoticeboardModel() {
   var self = this;
+
   self.rows = ko.observableArray();
+  self.ignores = ko.observableArray();
+
   self.addNotice = function(notice) {
-    self.rows.push(new NoticeRow(notice));
+    self.rows.push(new NoticeRow(notice, self.ignores));
   };
+
   self.sort = function() {
     self.rows.sort(function(left, right) {
       return left.published == right.published ? 0 : (left.published > right.published ? -1 : 1)
     });
-  }
+  };
+
+  self.toggleCpvVisibility = function(code) {
+    var ig = self.ignores();
+    var found = false;
+    console.log(code);
+    console.log(ig);
+    for(var i = 0; i < self.ignores().length; i++) {
+        if (ig[i] === code) {
+            self.ignores().splice(i, 1);
+            found = true;
+            console.log("found, removed");
+            break;
+        }
+    }
+    if (!found) {
+        self.ignores().push(code);
+        console.log("didn't find and hid ");
+    }
+    if (Modernizr.localstorage) {
+        localStorage['ignores'] = JSON.stringify(ko.toJS(self.ignores()));
+    }
+  };
+
 };
 
-function NoticeRow(data) {
+function NoticeRow(data, ignores) {
   var self = this;
   self.id = data.id;
+  self.ignores = ignores;
   self.name = data.name;
   self.link = data.link;
   self.type = data.type;
   self.published = toMoment(data.published);
   self.closes = toMoment(data.closes);
   self.cpv = data.cpv;
-  self.cpvExplanation = codes[data.cpv.substring(0, 2)];
+  self.shortCpv = data.cpv.substring(0, 2);
+  self.cpvExplanation = codes[self.shortCpv];
   self.description = data.description;
   self.organization = data.organization;
   self.note = data.note;
+  self.visible = ko.computed(function() {
+    var ig = self.ignores();
+    for (var i = 0; i < ig.length; i++) {
+      if (ig[i] === self.shortCpv) {
+        return false;
+      }
+    }
+    return true;
+  });
 };
 
 function toMoment(input) {

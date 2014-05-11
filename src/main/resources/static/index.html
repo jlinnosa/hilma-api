@@ -12,6 +12,7 @@
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/knockout/3.1.0/knockout-min.js"></script>
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/nprogress/0.1.2/nprogress.min.js"></script>
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.6.0/moment-with-langs.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.1/modernizr.min.js"></script>
     <link type="text/css" rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/nprogress/0.1.2/nprogress.min.css" />
 
     <script type="text/javascript" src="./app.js"></script>
@@ -32,18 +33,25 @@
 <div class="container">
     <div class="main">
         <ul class="cbp_tmtimeline" data-bind="foreach: noticeboard().rows">
-            <li data-bind="attr: { id: id, scpv: cpv.substring(0, 2) }">
+            <li>
                 <time class="cbp_tmtime" data-bind="attr: { datetime: published }">
                     <span data-bind="text: published.format('D.M.')">4/10/13</span>
                     <span data-bind="text: published.format('HH:mm')">18:30</span>
                 </time>
-                <div class="cbp_tmicon" data-bind="text: cpv.substring(0, 2), attr: { title: cpvExplanation }"></div>
-                <div class="cbp_tmlabel">
+                <div class="cbp_tmicon" data-bind="text: shortCpv, click: $parent.toggleRowVisibility, attr: { title: cpvExplanation }"></div>
+                <div class="cbp_tmlabel" data-bind="visible: visible() === true">
                     <h3>
                         <span data-bind="text: organization"></span>:
                         <span data-bind="text: name"></span>
                     </h3>
-                    <p data-bind="html: description"></p>
+                    <p data-bind="html: description, visible: visible"></p>
+                    <button data-bind="click: $parent.toggleRowVisibility">Remove</button>
+                </div>
+                <div class="cbp_tmlabel" data-bind="visible: visible() === false">
+                    <div>
+                        <span data-bind="text: organization"></span>:
+                        <span data-bind="text: name"></span>
+                    </div>
                 </div>
             </li>
         </ul>
@@ -66,10 +74,6 @@
         NProgress.inc();
         console.log("Connected");
         NProgress.done();
-
-        $("ul.cbp_tmtimeline").on("click", "div.cbp_tmicon", function (event) {
-            $('li[scpv=' + $(this).text() + ']').toggleClass('uninteresting');
-        });
     });
 </script>
 
