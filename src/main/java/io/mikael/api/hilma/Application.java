@@ -7,7 +7,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.cloud.app.ApplicationInstanceInfo;
 import org.springframework.cloud.config.java.AbstractCloudConfig;
-import org.springframework.cloud.config.java.ServiceScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -19,6 +18,8 @@ import org.springframework.web.socket.config.annotation.AbstractWebSocketMessage
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 
+import javax.sql.DataSource;
+
 @Configuration
 @EnableAutoConfiguration
 @ComponentScan
@@ -26,12 +27,15 @@ import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 public class Application {
 
     @Configuration
-    @ServiceScan
     @Profile("cloud")
     public class CloudConfig extends AbstractCloudConfig {
         @Bean
         public ApplicationInstanceInfo applicationInfo() {
             return cloud().getApplicationInstanceInfo();
+        }
+        @Bean
+        public DataSource dataSource() {
+            return connectionFactory().dataSource();
         }
     }
 
