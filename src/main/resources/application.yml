@@ -73,7 +73,7 @@ spring:
     hibernate.ddl-auto: update
 
 ---
-spring.profiles: heroku
+spring.profiles: cloud
 
 server.port: ${PORT}
 server.address: 0.0.0.0
@@ -83,11 +83,8 @@ spring:
     web-environment: true
     show-banner: false
     log-startup-info: false
-#  datasource:
-#    url: ${DATABASE_URL}
-#    platform: postgresql
-#    driverClassName: org.postgresql.Driver
   jpa:
     database: POSTGRESQL
+    database-platform: org.hibernate.dialect.PostgreSQL9Dialect
     generate-ddl: false
     hibernate.ddl-auto: none

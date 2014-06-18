@@ -5,6 +5,7 @@ import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
 import lombok.NoArgsConstructor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.cloud.app.ApplicationInstanceInfo;
 import org.springframework.cloud.config.java.AbstractCloudConfig;
 import org.springframework.cloud.config.java.ServiceScan;
 import org.springframework.context.annotation.Bean;
@@ -24,10 +25,14 @@ import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 @EnableScheduling
 public class Application {
 
-    @Profile("heroku")
     @Configuration
     @ServiceScan
-    public static class CloudConfiguration extends AbstractCloudConfig {
+    @Profile("cloud")
+    public class CloudConfig extends AbstractCloudConfig {
+        @Bean
+        public ApplicationInstanceInfo applicationInfo() {
+            return cloud().getApplicationInstanceInfo();
+        }
     }
 
     @Configuration
