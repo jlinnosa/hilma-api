@@ -55,7 +55,7 @@ public class ScrapeTest {
     public void testListScrape() throws IOException {
         final Document doc = Jsoup.parse(allHtml.getInputStream(), "UTF-8", "");
         final List<ScrapedLink> links = SiteScraper.scrapeLinks(doc);
-        assertEquals(links.size(), 3161);
+        assertEquals(3161, links.size());
         for (final ScrapedLink l : links) {
             assertNotNull(l.published);
             assertNotNull(l.name);
