@@ -3,8 +3,10 @@ package io.mikael.api.hilma;
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
 import lombok.NoArgsConstructor;
+import org.h2.server.web.WebServlet;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.context.embedded.ServletRegistrationBean;
 import org.springframework.cloud.app.ApplicationInstanceInfo;
 import org.springframework.cloud.config.java.AbstractCloudConfig;
 import org.springframework.context.annotation.Bean;
@@ -49,13 +51,13 @@ public class Application {
     public static class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
 
         @Override
-        public void configureMessageBroker(MessageBrokerRegistry config) {
+        public void configureMessageBroker(final MessageBrokerRegistry config) {
             config.setApplicationDestinationPrefixes("/app")
                     .enableSimpleBroker("/queue", "/topic");
         }
 
         @Override
-        public void registerStompEndpoints(StompEndpointRegistry registry) {
+        public void registerStompEndpoints(final StompEndpointRegistry registry) {
             registry.addEndpoint("/hilma").withSockJS();
         }
         
@@ -67,6 +69,6 @@ public class Application {
     }
 
     public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
+        SpringApplication.run(Application.class, args).registerShutdownHook();
     }
 }

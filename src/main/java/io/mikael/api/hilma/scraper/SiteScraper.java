@@ -2,6 +2,7 @@ package io.mikael.api.hilma.scraper;
 
 import io.mikael.api.hilma.domain.Notice;
 import io.mikael.api.hilma.domain.ScrapedLink;
+import org.jetbrains.annotations.Contract;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -30,13 +31,14 @@ public class SiteScraper {
 
     private static final Pattern TITLE_PATTERN = Pattern.compile("([IVXLCDM]*\\.[0-9]*(?:\\.[0-9]*)) (.*)");
 
-    private static final List<DateTimeFormatter> FORMATTERS = Arrays.asList(
-            "d.M.y H.m", "d.M.y H:m", "d.M.y", "d.M.y 'klo' H.m"
-    ).stream().map(DateTimeFormatter::ofPattern).collect(Collectors.toList());
+    private static final List<DateTimeFormatter> FORMATTERS =
+            Arrays.asList("d.M.y H.m", "d.M.y H:m", "d.M.y", "d.M.y 'klo' H.m")
+                    .stream().map(DateTimeFormatter::ofPattern).collect(Collectors.toList());
 
     /**
      * HILMA has several suprising alternative date formats.
      */
+    @Contract("_ -> !null")
     private static Optional<LocalDateTime> parseLocalDateTime(final String input) {
         if (input == null || input.isEmpty()) {
             return Optional.empty();
@@ -51,6 +53,7 @@ public class SiteScraper {
                 .filter(Objects::nonNull).findFirst();
     }
 
+    @Contract("_ -> !null")
     private static String findCode(final String text) {
         final Matcher m = CPV_PATTERN.matcher(text);
         m.find();
@@ -69,28 +72,21 @@ public class SiteScraper {
     /**
      * Parse a list of new scraped links out of a HTML InputStream.
      */
-    public static List<ScrapedLink> scrapeLinks(final Document doc) throws IOException {
+    @Contract("_ -> !null")
+    public static List<ScrapedLink> scrapeLinks(final Document doc) {
         final List<ScrapedLink> ret = new ArrayList<>();
         for (final Element e : doc.select("tr:has(td)")) {
             final Elements data = e.select("td");
             if (data.size() == 4) {
                 final Element linkElement = data.get(3).children().first();
                 final String link = linkElement.attr("href");
-                final ScrapedLink.Builder bld = ScrapedLink.builder()
+                final ScrapedLink.Builder builder = ScrapedLink.builder()
                         .id(find(link, LINK_ID_PATTERN).group(1))
                         .link(link).name(linkElement.text())
                         .type(data.get(3).select("span.meta").first().text());
-
-                final Optional<LocalDateTime> published = parseLocalDateTime(data.get(1).text());
-                if (published.isPresent()) {
-                    bld.published(published.get());
-                }
-                final Optional<LocalDateTime> closes = parseLocalDateTime(data.get(2).text());
-                if (closes.isPresent()) {
-                    bld.closes(closes.get());
-                }
-                ret.add(bld.build());
-
+                parseLocalDateTime(data.get(1).text()).ifPresent(builder::published);
+                parseLocalDateTime(data.get(2).text()).ifPresent(builder::closes);
+                ret.add(builder.build());
             }
         }
         return ret;
@@ -99,6 +95,7 @@ public class SiteScraper {
     /**
      * There is still some regrettable magic in here, and different types all mixed together.
      */
+    @Contract("_ -> !null")
     public static Notice.Builder scrapeNotice(final Document doc) {
         doc.outputSettings().escapeMode(Entities.EscapeMode.xhtml);
 
@@ -165,8 +162,8 @@ public class SiteScraper {
 
         // type, noticeName
         final List<String> s = content.select("h2").stream()
-                .map(e -> e.childNodes())
-                .flatMap(l -> l.stream())
+                .map(Node::childNodes)
+                .flatMap(Collection::stream)
                 .map(Node::toString)
                 .map(String::trim)
                 .collect(Collectors.toList());

@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
 @Service
 public class ScrapeService {
@@ -40,24 +41,29 @@ public class ScrapeService {
 
     private static final DateTimeFormatter DD_MM_YYYY = DateTimeFormatter.ofPattern("d.M.y");
 
-    @Scheduled(fixedRate=600000L, initialDelay=60000L)
+    @Scheduled(fixedRate = 600000L, initialDelay = 60000L)
     public void fetchNewNotices() throws IOException {
         final Document doc = Jsoup.connect(newListUrl)
                 .userAgent(userAgent).followRedirects(false)
                 .get();
-        for (final ScrapedLink l : SiteScraper.scrapeLinks(doc)) {
-            if (noticeDao.findOne(l.getId()) == null) {
-                final Notice notice = fetchNotice(l.getLink());
-                noticeDao.save(notice);
-                webStomp.convertAndSend("/topic/hilma.foo", notice);
-            }
-        }
+        SiteScraper.scrapeLinks(doc).stream()
+                .map(l -> noticeDao.findOne(l.getId()))
+                .filter(Objects::nonNull)
+                .map(l -> fetchNotice(l.getLink()))
+                .forEach(n -> {
+                    noticeDao.save(n);
+                    webStomp.convertAndSend("/topic/hilma.foo", n);
+                });
     }
 
-    private Notice fetchNotice(final String link) throws IOException {
-        final Document doc = Jsoup.connect(link)
-                .userAgent(userAgent).followRedirects(false).get();
-        return SiteScraper.scrapeNotice(doc).build();
+    private Notice fetchNotice(final String link) {
+        try {
+            final Document doc = Jsoup.connect(link)
+                    .userAgent(userAgent).followRedirects(false).get();
+            return SiteScraper.scrapeNotice(doc).build();
+        } catch (final IOException e) {
+            return null;
+        }
     }
 
     public void fetchNotices(final LocalDate from, final LocalDate to) throws IOException {
@@ -68,11 +74,12 @@ public class ScrapeService {
                 .data("_s[published_end]", DD_MM_YYYY.format(to))
                 .data("all", "1")
                 .get();
-        for (final ScrapedLink l : SiteScraper.scrapeLinks(doc)) {
-            if (noticeDao.findOne(l.getId()) == null) {
-                noticeDao.save(fetchNotice(l.getLink()));
-            }
-        }
+        SiteScraper.scrapeLinks(doc).stream()
+                .map(l -> noticeDao.findOne(l.getId()))
+                .filter(Objects::nonNull)
+                .map(l -> fetchNotice(l.getLink()))
+                .filter(Objects::nonNull)
+                .forEach(noticeDao::save);
     }
 
 }
