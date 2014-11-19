@@ -47,8 +47,7 @@ public class ScrapeService {
                 .userAgent(userAgent).followRedirects(false)
                 .get();
         SiteScraper.scrapeLinks(doc).stream()
-                .map(l -> noticeDao.findOne(l.getId()))
-                .filter(Objects::nonNull)
+                .filter(l -> noticeDao.findOne(l.getId()) == null)
                 .map(l -> fetchNotice(l.getLink()))
                 .forEach(n -> {
                     noticeDao.save(n);
