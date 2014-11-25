@@ -47,11 +47,11 @@ public class ScrapeService {
                 .userAgent(userAgent).followRedirects(false)
                 .get();
         SiteScraper.scrapeLinks(doc).stream()
-                .filter(l -> noticeDao.findOne(l.getId()) == null)
-                .map(l -> fetchNotice(l.getLink()))
-                .forEach(n -> {
-                    noticeDao.save(n);
-                    webStomp.convertAndSend("/topic/hilma.foo", n);
+                .filter(scrapedLink -> noticeDao.findOne(scrapedLink.getId()) == null)
+                .map(scrapedLink -> fetchNotice(scrapedLink.getLink()))
+                .forEach(notice -> {
+                    noticeDao.save(notice);
+                    webStomp.convertAndSend("/topic/hilma.foo", notice);
                 });
     }
 
@@ -74,9 +74,8 @@ public class ScrapeService {
                 .data("all", "1")
                 .get();
         SiteScraper.scrapeLinks(doc).stream()
-                .map(l -> noticeDao.findOne(l.getId()))
-                .filter(Objects::nonNull)
-                .map(l -> fetchNotice(l.getLink()))
+                .filter(scrapedLink -> noticeDao.findOne(scrapedLink.getId()) == null)
+                .map(scrapedLink -> fetchNotice(scrapedLink.getLink()))
                 .filter(Objects::nonNull)
                 .forEach(noticeDao::save);
     }
