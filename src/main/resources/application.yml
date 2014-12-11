@@ -12,11 +12,12 @@ spring.profiles: default
 spring:
   datasource:
     platform: h2
-    url: "jdbc:h2:mem:"
+    url: "jdbc:h2:${java.io.tmpdir}/hilma;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE"
   jpa:
+    show-sql: false
     database: H2
-    generate-ddl: true
-    hibernate.ddl-auto: create-drop
+    database-platform: H2
+    cache.use_query_cache: true
 
 ---
 spring.profiles: dev-persistent
