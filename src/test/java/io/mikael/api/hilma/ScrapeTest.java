@@ -72,16 +72,11 @@ public class ScrapeTest {
                     try (final InputStream fis = new FileInputStream(f)) {
                         final Document doc = Jsoup.parse(fis, "UTF-8", "/fi/notice/view/2014-011132/");
                         final Notice notice = SiteScraper.scrapeNotice(doc).build();
-                        if (notice.getCloses() == null) {
-                            LOG.debug(notice.getId() + " " + notice.getType() + " " + notice.getPublished()
-                                    + " " + notice.getNoticeName());
-                        }
                         dao.save(notice);
                     } catch (final IOException e) {
                         // ignore
                     }
                 });
-        LOG.debug("from dao: " + dao.findOne("2014-012067"));
     }
 
 }
