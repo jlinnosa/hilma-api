@@ -24,6 +24,12 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-tomcat</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -98,25 +104,6 @@
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
             <version>${jackson.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-spring-service-connector</artifactId>
-            <version>1.1.0.RELEASE</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
-                </exclusion>
-            </exclusions>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-heroku-connector</artifactId>
-            <version>1.1.0.RELEASE</version>
         </dependency>
 
         <dependency>
@@ -198,47 +185,5 @@
             </plugin>
         </plugins>
     </build>
-
-    <profiles>
-        <profile>
-            <id>heroku</id>
-            <activation>
-                <property>
-                    <name>env.DYNO</name>
-                </property>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.newrelic.agent.java</groupId>
-                    <artifactId>newrelic-agent</artifactId>
-                    <version>3.11.0</version>
-                    <scope>provided</scope>
-                </dependency>
-            </dependencies>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-dependency-plugin</artifactId>
-                        <version>2.9</version>
-                        <executions>
-                            <execution>
-                                <id>copy-new-relic</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>copy-dependencies</goal>
-                                </goals>
-                                <configuration>
-                                    <includeGroupIds>com.newrelic.agent.java</includeGroupIds>
-                                    <includeArtifactIds>newrelic-agent</includeArtifactIds>
-                                    <stripVersion>true</stripVersion>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 
 </project>
