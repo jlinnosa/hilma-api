@@ -25,18 +25,6 @@ public class MainController {
     @Autowired
     private ScrapeService ss;
 
-    /**
-     * We want every request/response pair to be handled as UTF-8, and every response identify itself as UTF-8.
-     */
-    @Bean
-    public Filter characterSetFilter() {
-        return (LambdaFilter) (req, res, chain) -> {
-            req.setCharacterEncoding("UTF-8");
-            res.setCharacterEncoding("UTF-8");
-            chain.doFilter(req, res);
-        };
-    }
-
     @RequestMapping("/fetch")
     public ResponseEntity<String> fetch() throws IOException {
         ss.fetchNewNotices();
