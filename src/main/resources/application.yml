@@ -1,10 +1,19 @@
-error.whitelabel.enabled: false
+error.whitelabel.enabled: true
 spring.jackson.serialization.INDENT_OUTPUT: true
 
 server:
   port: 8080
   address: 127.0.0.1
   sessionTimeout: 0
+
+spring.data.elasticsearch.properties.node.name: localsearch
+
+logging.level.org.springframework: ERROR
+logging.level.org.hibernate: ERROR
+logging.level.org.elasticsearch: ERROR
+logging.level.io.undertow: ERROR
+logging.level.org.xnio: ERROR
+logging.level.io.mikael: WARN
 
 ---
 spring.profiles: default
@@ -70,6 +79,7 @@ spring:
     driverClassName: org.postgresql.Driver
   jpa:
     database: POSTGRESQL
+    database-platform: org.hibernate.dialect.PostgreSQL9Dialect
     generate-ddl: false
     hibernate.ddl-auto: update
 

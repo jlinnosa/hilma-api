@@ -2,7 +2,6 @@ package io.mikael.api.hilma.service;
 
 import io.mikael.api.hilma.domain.Notice;
 import io.mikael.api.hilma.domain.NoticeDao;
-import io.mikael.api.hilma.domain.ScrapedLink;
 import io.mikael.api.hilma.scraper.SiteScraper;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -10,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -23,9 +21,6 @@ import java.util.Objects;
 public class ScrapeService {
 
     private static final Logger LOG = LoggerFactory.getLogger(ScrapeService.class);
-
-    @Autowired
-    private SimpMessagingTemplate webStomp;
 
     @Autowired
     private NoticeDao noticeDao;
@@ -49,10 +44,7 @@ public class ScrapeService {
         SiteScraper.scrapeLinks(doc).stream()
                 .filter(scrapedLink -> noticeDao.findOne(scrapedLink.getId()) == null)
                 .map(scrapedLink -> fetchNotice(scrapedLink.getLink()))
-                .forEach(notice -> {
-                    noticeDao.save(notice);
-                    webStomp.convertAndSend("/topic/hilma.foo", notice);
-                });
+                .forEach(noticeDao::save);
     }
 
     private Notice fetchNotice(final String link) {

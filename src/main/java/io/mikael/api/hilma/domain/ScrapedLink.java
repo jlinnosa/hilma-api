@@ -3,7 +3,7 @@ package io.mikael.api.hilma.domain;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.Builder;
+import lombok.Builder;
 
 import java.time.LocalDateTime;
 

@@ -2,20 +2,12 @@ package io.mikael.api.hilma.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
-import lombok.experimental.Builder;
+import lombok.*;
 import org.hibernate.annotations.Type;
+import org.springframework.data.elasticsearch.annotations.Document;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
 
@@ -26,10 +18,12 @@ import java.time.LocalDateTime;
 @Builder(builderClassName = "Builder")
 @Entity @Table(name = "scraped_notices")
 @ToString(exclude="html")
+@Document(indexName = "notice", type = "notice", shards = 1, replicas = 0, refreshInterval = "-1")
 public class Notice {
 
     /** The HILMA-specific notice ID of the form "2014-011132". */
-    @Id
+    @javax.persistence.Id
+    @org.springframework.data.annotation.Id
     private String id;
 
     /** Originally fetched URL. */
@@ -45,14 +39,10 @@ public class Notice {
 
     /** FI: VI.5 Tämän ilmoituksen lähettämispäivä */
     @Type(type="org.jadira.usertype.dateandtime.threeten.PersistentLocalDateTime")
-    @JsonSerialize(using = ToStringSerializer.class)
-    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime published;
 
     /** FI: IV.3.4 Tarjousten vastaanottamisen määräaika */
     @Type(type="org.jadira.usertype.dateandtime.threeten.PersistentLocalDateTime")
-    @JsonSerialize(using = ToStringSerializer.class)
-    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime closes;
 
     /** FI: II.1.6 Yhteinen hankintanimikkeistö (CPV): Pääkohde */

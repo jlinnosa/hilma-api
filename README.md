@@ -1,4 +1,4 @@
-HILMA (http://www.hankintailmoitukset.fi/) scraper, API, and better reader.
+HILMA (http://www.hankintailmoitukset.fi/) scraper, REST API.
 
 ### Develop
 
@@ -36,17 +36,8 @@ Provides JPA data structures and DAO with Lombok and Spring Data JPA.
 
 Supports Java 8 ``java.time`` types JSR-310 with Hibernate and Jackson extensions.
 
-Provides a HTML5 WebSocket STOMP interface to new data events with Spring Framework 4.
-
-Consumes new data events on client side with SockJS and Stomp.js.
-
-Handles client-side timestamp data with Moment.js.
-
-Provides a single-page user interface with KnockoutJS and JQuery.
-
-Timeline UI concept from @codrops.
-
 Unit tests with JUnit and spring-test.
+
 
 ### TODO
 

@@ -2,8 +2,6 @@ package io.mikael.api.hilma.scraper;
 
 import io.mikael.api.hilma.domain.Notice;
 import io.mikael.api.hilma.domain.ScrapedLink;
-import org.jetbrains.annotations.Contract;
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Entities;
@@ -13,7 +11,6 @@ import org.jsoup.safety.Whitelist;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -38,7 +35,6 @@ public class SiteScraper {
     /**
      * HILMA has several suprising alternative date formats.
      */
-    @Contract("_ -> !null")
     private static Optional<LocalDateTime> parseLocalDateTime(final String input) {
         if (input == null || input.isEmpty()) {
             return Optional.empty();
@@ -53,7 +49,6 @@ public class SiteScraper {
                 .filter(Objects::nonNull).findFirst();
     }
 
-    @Contract("_ -> !null")
     private static String findCode(final String text) {
         final Matcher m = CPV_PATTERN.matcher(text);
         m.find();
@@ -72,7 +67,6 @@ public class SiteScraper {
     /**
      * Parse a list of new scraped links out of a HTML InputStream.
      */
-    @Contract("_ -> !null")
     public static List<ScrapedLink> scrapeLinks(final Document doc) {
         final List<ScrapedLink> ret = new ArrayList<>();
         for (final Element e : doc.select("tr:has(td)")) {
@@ -95,7 +89,6 @@ public class SiteScraper {
     /**
      * There is still some regrettable magic in here, and different types all mixed together.
      */
-    @Contract("_ -> !null")
     public static Notice.Builder scrapeNotice(final Document doc) {
         doc.outputSettings().escapeMode(Entities.EscapeMode.xhtml);
 
