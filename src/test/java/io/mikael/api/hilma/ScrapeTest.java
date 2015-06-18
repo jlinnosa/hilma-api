@@ -1,8 +1,8 @@
 package io.mikael.api.hilma;
 
+import io.mikael.api.hilma.domain.Notice;
 import io.mikael.api.hilma.domain.NoticeDao;
 import io.mikael.api.hilma.domain.ScrapedLink;
-import io.mikael.api.hilma.domain.Notice;
 import io.mikael.api.hilma.scraper.SiteScraper;
 import io.mikael.api.hilma.service.ScrapeService;
 import org.jsoup.Jsoup;
@@ -15,11 +15,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.core.io.Resource;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
-import javax.annotation.Nullable;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -66,6 +66,7 @@ public class ScrapeTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     public void testDetailScrape() throws Exception {
         Arrays.stream(postsDirectory.getFile().listFiles())
                 .forEach(f -> {

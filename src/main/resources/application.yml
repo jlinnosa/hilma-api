@@ -8,10 +8,10 @@ server:
 
 spring.data.elasticsearch.properties.node.name: localsearch
 
-logging.level.org.springframework: ERROR
+#logging.level.org.springframework: ERROR
 logging.level.org.hibernate: ERROR
 logging.level.org.elasticsearch: ERROR
-logging.level.io.undertow: ERROR
+#logging.level.io.undertow: ERROR
 logging.level.org.xnio: ERROR
 logging.level.io.mikael: WARN
 
@@ -37,8 +37,8 @@ spring:
     url: jdbc:h2:./devdb
   jpa:
     database: H2
-    generate-ddl: true
-    hibernate.ddl-auto: create-drop
+    generate-ddl: false
+    hibernate.ddl-auto: update
 
 ---
 spring.profiles: test
@@ -56,7 +56,7 @@ spring:
     log-startup-info: true
   datasource:
     platform: h2
-    url: "jdbc:h2:mem:"
+    url: "jdbc:h2:mem:;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE"
   jpa:
     database: H2
     generate-ddl: true
