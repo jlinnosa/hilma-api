@@ -1,9 +1,9 @@
 package io.mikael.api.hilma;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import io.mikael.api.hilma.domain.Notice;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.context.annotation.Bean;
+import org.springframework.boot.orm.jpa.EntityScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 
 @SpringBootApplication
 @EnableScheduling
+@EntityScan(basePackageClasses=Notice.class)
 public class Application {
 
     @Configuration
@@ -28,11 +29,6 @@ public class Application {
         protected void configure(HttpSecurity http) throws Exception {
             http.csrf().disable().httpBasic();
         }
-    }
-
-    @Bean
-    public ObjectMapper objectMapper() {
-        return new ObjectMapper();
     }
 
     public static void main(final String... args) throws Exception {

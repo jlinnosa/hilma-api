@@ -8,6 +8,8 @@ server:
 
 spring.data.elasticsearch.properties.node.name: localsearch
 
+#spring.jpa.properties.hibernate.temp.use_jdbc_metadata_defaults: false
+
 #logging.level.org.springframework: ERROR
 logging.level.org.hibernate: ERROR
 logging.level.org.elasticsearch: ERROR

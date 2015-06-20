@@ -2,6 +2,7 @@ package io.mikael.api.hilma.service;
 
 import io.mikael.api.hilma.domain.Notice;
 import io.mikael.api.hilma.domain.NoticeDao;
+import io.mikael.api.hilma.util.RunAs;
 import io.mikael.api.hilma.scraper.SiteScraper;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -38,13 +39,15 @@ public class ScrapeService {
 
     @Scheduled(fixedRate = 600000L, initialDelay = 60000L)
     public void fetchNewNotices() throws IOException {
-        final Document doc = Jsoup.connect(newListUrl)
-                .userAgent(userAgent).followRedirects(false)
-                .get();
-        SiteScraper.scrapeLinks(doc).stream()
-                .filter(scrapedLink -> noticeDao.findOne(scrapedLink.getId()) == null)
-                .map(scrapedLink -> fetchNotice(scrapedLink.getLink()))
-                .forEach(noticeDao::save);
+        RunAs.runAsAdmin(() -> {
+            final Document doc = Jsoup.connect(newListUrl)
+                    .userAgent(userAgent).followRedirects(false)
+                    .get();
+            SiteScraper.scrapeLinks(doc).stream()
+                    .filter(scrapedLink -> noticeDao.findOne(scrapedLink.getId()) == null)
+                    .map(scrapedLink -> fetchNotice(scrapedLink.getLink()))
+                    .forEach(noticeDao::save);
+        });
     }
 
     private Notice fetchNotice(final String link) {
