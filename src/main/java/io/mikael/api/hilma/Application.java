@@ -26,7 +26,7 @@ public class Application {
                     withUser("ollie").password("gierke").roles("USER", "ADMIN");
         }
         @Override
-        protected void configure(HttpSecurity http) throws Exception {
+        protected void configure(final HttpSecurity http) throws Exception {
             http.csrf().disable().httpBasic();
         }
     }

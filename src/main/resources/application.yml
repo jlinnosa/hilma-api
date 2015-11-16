@@ -1,10 +1,10 @@
-error.whitelabel.enabled: true
+server.error.whitelabel.enabled: true
 spring.jackson.serialization.INDENT_OUTPUT: true
 
 server:
   port: 8080
   address: 127.0.0.1
-  sessionTimeout: 0
+  session.timeout: 0
 
 spring.data.elasticsearch.properties.node.name: localsearch
 
@@ -28,7 +28,6 @@ spring:
     show-sql: false
     database: H2
     database-platform: H2
-    cache.use_query_cache: true
 
 ---
 spring.profiles: dev-persistent
@@ -48,14 +47,11 @@ spring.profiles: test
 server:
   port: 0
   address: 127.0.0.1
-  sessionTimeout: 0
+  session.timeout: 0
 
 management.port: -1
 
 spring:
-  main:
-    show-banner: false
-    log-startup-info: true
   datasource:
     platform: h2
     url: "jdbc:h2:mem:;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE"
@@ -73,8 +69,6 @@ server.address: 0.0.0.0
 spring:
   main:
     web-environment: true
-    show-banner: false
-    log-startup-info: false
   datasource:
     url: "jdbc:postgresql:${USER}"
     platform: postgresql
@@ -84,20 +78,3 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQL9Dialect
     generate-ddl: false
     hibernate.ddl-auto: update
-
----
-spring.profiles: cloud
-
-server.port: ${PORT}
-server.address: 0.0.0.0
-
-spring:
-  main:
-    web-environment: true
-    show-banner: false
-    log-startup-info: false
-  jpa:
-    database: POSTGRESQL
-    database-platform: org.hibernate.dialect.PostgreSQL9Dialect
-    generate-ddl: false
-    hibernate.ddl-auto: none

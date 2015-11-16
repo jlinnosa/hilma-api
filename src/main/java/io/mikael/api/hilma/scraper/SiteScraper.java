@@ -18,6 +18,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component
 public class SiteScraper {
@@ -55,12 +56,12 @@ public class SiteScraper {
         return m.group(1);
     }
 
-    private static Matcher find(final String text, final Pattern pattern) {
+    private static Optional<Matcher> find(final String text, final Pattern pattern) {
         final Matcher ret = pattern.matcher(text);
         if (ret.find()) {
-            return ret;
+            return Optional.of(ret);
         } else {
-            return null;
+            return Optional.empty();
         }
     }
 
@@ -75,15 +76,23 @@ public class SiteScraper {
                 final Element linkElement = data.get(3).children().first();
                 final String link = linkElement.attr("href");
                 final ScrapedLink.Builder builder = ScrapedLink.builder()
-                        .id(find(link, LINK_ID_PATTERN).group(1))
                         .link(link).name(linkElement.text())
                         .type(data.get(3).select("span.meta").first().text());
+                find(link, LINK_ID_PATTERN).ifPresent(m -> builder.id(m.group(1)));
                 parseLocalDateTime(data.get(1).text()).ifPresent(builder::published);
                 parseLocalDateTime(data.get(2).text()).ifPresent(builder::closes);
                 ret.add(builder.build());
             }
         }
         return ret;
+    }
+
+    static <T> Stream<T> asStream(Optional<T> opt) {
+        if (opt.isPresent()) {
+            return Stream.of(opt.get());
+        } else {
+            return Stream.empty();
+        }
     }
 
     /**
@@ -100,7 +109,8 @@ public class SiteScraper {
         // id
         doc.select("form#login").stream()
                 .map(e -> e.attr("action"))
-                .map(action -> find(action, LINK_ID_PATTERN).group(1))
+                .flatMap(action -> asStream(find(action, LINK_ID_PATTERN)))
+                .map(m -> m.group(1))
                 .filter(Objects::nonNull)
                 .findFirst()
                 .ifPresent(builder::id);

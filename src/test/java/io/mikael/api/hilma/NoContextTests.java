@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 
 public class NoContextTests {
 
-
     @Test
     public void testDeeTees() throws Exception {
         final File f = Paths.get("src/test/resources/www/posts/2014-011982.html").toFile();
@@ -28,14 +27,16 @@ public class NoContextTests {
                 System.err.println(first.text());
                 System.err.println(second.text());
                 second.select("table.CONTACT[summary]").stream()
-                        .map(NoContextTests::contactSummaryTableToMap)
+                        .map(NoContextTests::twoColumnTableToMap)
                         .forEach(System.err::println);
             });
         }
     }
 
-
-    private static Map<String, String> contactSummaryTableToMap(final Element table) {
+    /**
+     * Makes a map from a two-column table, no header.
+     */
+    private static Map<String, String> twoColumnTableToMap(final Element table) {
         return table.select("tr").stream()
                 .map(tr -> tr.select("td"))
                 .filter(tds -> tds.size() == 2)
